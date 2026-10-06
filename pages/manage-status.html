@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage Item Status — FindIt</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <a href="../index.html" class="logo">FindIt</a>
+      <nav>
+        <a href="items.html">Browse</a>
+        <a href="report-lost.html">Report Lost</a>
+        <a href="report-found.html">Report Found</a>
+        <a href="manage-status.html" class="active">Manage Status</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page">
+    <h1>Manage Item Status</h1>
+    <p class="page-subtitle">
+      Update what happened to your reported items. Claimed or recovered items
+      are hidden from public listings automatically.
+    </p>
+
+    <div class="filter-row">
+      <button class="btn btn-ghost active" data-filter="active">Active</button>
+      <button class="btn btn-ghost" data-filter="resolved">Resolved</button>
+      <button class="btn btn-ghost" data-filter="all">All</button>
+    </div>
+
+    <div id="status-list" class="status-list"></div>
+  </main>
+
+  <script src="../js/status.js"></script>
+  <script src="../js/items.js"></script>
+  <script src="../js/forms.js"></script>
+  <script src="../js/transitions.js"></script>
+  <script src="../js/manage-status.js"></script>
+</body>
+</html>

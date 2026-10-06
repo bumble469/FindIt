@@ -36,3 +36,158 @@
   <script src="../js/forms.js"></script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Found Item — FindIt</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <a href="../index.html" class="logo">FindIt</a>
+      <nav>
+        <a href="items.html">Browse</a>
+        <a href="report-lost.html">Report Lost</a>
+        <a href="report-found.html" class="active">Report Found</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page">
+    <h1>Report a Found Item</h1>
+    <p class="page-subtitle">
+      Thanks for helping! Tell us what you found and where the item is now.
+    </p>
+
+    <form id="form-found" novalidate>
+
+      <section class="form-section">
+        <h2>1. Item Information</h2>
+
+        <div class="field">
+          <label for="found-name">Item name <span class="req">*</span></label>
+          <input type="text" id="found-name" maxlength="80" />
+        </div>
+
+        <div class="field">
+          <label for="found-category">Category <span class="req">*</span></label>
+          <select id="found-category">
+            <option value="">— Select —</option>
+            <option>Electronics</option>
+            <option>Bags</option>
+            <option>Documents</option>
+            <option>Books</option>
+            <option>Accessories</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="found-desc">Description <span class="req">*</span></label>
+          <textarea id="found-desc" rows="4" maxlength="500"></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="found-date">Date found <span class="req">*</span></label>
+            <input type="date" id="found-date" />
+          </div>
+          <div class="field">
+            <label for="found-time">Approximate time</label>
+            <input type="time" id="found-time" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="found-location">Location where it was found <span class="req">*</span></label>
+          <input type="text" id="found-location" maxlength="120" />
+        </div>
+
+        <div class="field">
+          <label for="found-photo">Photo of the found item</label>
+          <input type="file" id="found-photo" accept="image/*" />
+          <div id="found-photo-preview" class="preview-grid"></div>
+        </div>
+
+        <div class="field">
+          <label for="found-additional">Additional details</label>
+          <textarea id="found-additional" rows="3" maxlength="400"></textarea>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <h2>2. Where is the item now?</h2>
+
+        <div class="radio-group">
+          <label class="radio-card">
+            <input type="radio" name="found-possession" value="finder" />
+            <span>
+              <strong>I have the item</strong>
+              <small>You are currently holding it.</small>
+            </span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="found-possession" value="office" />
+            <span>
+              <strong>Submitted to Campus Lost &amp; Found Office</strong>
+              <small>You handed it in at the official campus office.</small>
+            </span>
+          </label>
+        </div>
+
+        <div id="finder-contact-block" style="display:none;">
+          <h3>Your contact information</h3>
+          <div class="field">
+            <label for="found-finder-name">Your name <span class="req">*</span></label>
+            <input type="text" id="found-finder-name" maxlength="80" />
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="found-finder-email">Email <span class="req">*</span></label>
+              <input type="email" id="found-finder-email" />
+            </div>
+            <div class="field">
+              <label for="found-finder-phone">Phone <span class="req">*</span></label>
+              <input type="tel" id="found-finder-phone" />
+            </div>
+          </div>
+        </div>
+
+        <div id="office-info-block" style="display:none;">
+          <h3>Campus Lost &amp; Found Office</h3>
+          <p class="hint">Auto-populated — no need to type anything.</p>
+          <div class="office-card">
+            <p><strong id="office-name"></strong></p>
+            <p>📍 <span id="office-address"></span></p>
+            <p>🕘 <span id="office-hours"></span></p>
+            <p>✉️ <span id="office-contact"></span></p>
+          </div>
+        </div>
+      </section>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Report Found Item</button>
+        <button type="reset"  class="btn btn-ghost">Reset</button>
+      </div>
+    </form>
+
+    <!-- ================= MY PAST FOUND REPORTS ================= -->
+    <section class="form-section my-reports">
+      <h2>My Found Item Reports</h2>
+      <p class="hint">
+        Items you've reported as found. Update the location as things move:
+        <em>Held by finder → Submitted to office → Claimed by owner</em>.
+      </p>
+      <div id="my-found-reports" class="status-list"></div>
+    </section>
+
+  </main>
+
+  <script src="../js/item-actions.js"></script>
+  <script src="../js/forms.js"></script>
+</body>
+</html>

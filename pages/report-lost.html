@@ -36,3 +36,152 @@
   <script src="../js/forms.js"></script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Lost Item — FindIt</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <a href="../index.html" class="logo">FindIt</a>
+      <nav>
+        <a href="items.html">Browse</a>
+        <a href="report-lost.html" class="active">Report Lost</a>
+        <a href="report-found.html">Report Found</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page">
+    <h1>Report a Lost Item</h1>
+    <p class="page-subtitle">
+      Tell us what you lost. Your detailed identifying information stays private
+      and is used only for ownership verification.
+    </p>
+
+    <form id="form-lost" novalidate>
+
+      <!-- SECTION 1: ITEM INFO -->
+      <section class="form-section">
+        <h2>1. Item Information</h2>
+
+        <div class="field">
+          <label for="lost-name">Item name <span class="req">*</span></label>
+          <input type="text" id="lost-name" name="lost-name"
+                 placeholder="e.g. Black iPhone 13" maxlength="80" />
+        </div>
+
+        <div class="field">
+          <label for="lost-category">Category <span class="req">*</span></label>
+          <select id="lost-category" name="lost-category">
+            <option value="">— Select —</option>
+            <option>Electronics</option>
+            <option>Bags</option>
+            <option>Documents</option>
+            <option>Books</option>
+            <option>Accessories</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="lost-desc">Description <span class="req">*</span></label>
+          <textarea id="lost-desc" name="lost-desc" rows="4" maxlength="500"
+                    placeholder="General description visible to the public (no sensitive details)."></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="lost-date">Date lost <span class="req">*</span></label>
+            <input type="date" id="lost-date" name="lost-date" />
+          </div>
+          <div class="field">
+            <label for="lost-time">Approximate time</label>
+            <input type="time" id="lost-time" name="lost-time" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="lost-location">Location where it was lost <span class="req">*</span></label>
+          <input type="text" id="lost-location" name="lost-location"
+                 placeholder="e.g. Near Central Library entrance" maxlength="120" />
+        </div>
+
+        <div class="field">
+          <label for="lost-additional">Additional details</label>
+          <textarea id="lost-additional" name="lost-additional" rows="3" maxlength="400"
+                    placeholder="Anything else worth mentioning?"></textarea>
+        </div>
+      </section>
+
+      <!-- SECTION 2: PHOTOS + IDENTIFYING -->
+      <section class="form-section">
+        <h2>2. Photos &amp; Identifying Details</h2>
+        <p class="hint">
+          Upload old photos showing what the item normally looks like.
+          These are <strong>private</strong> and used only to verify ownership.
+        </p>
+
+        <div class="field">
+          <label for="lost-photos">Old / existing photos (up to 5)</label>
+          <input type="file" id="lost-photos" name="lost-photos"
+                 accept="image/*" multiple />
+          <div id="lost-photos-preview" class="preview-grid"></div>
+        </div>
+
+        <div class="field">
+          <label for="lost-identifying">Unique identifying details</label>
+          <textarea id="lost-identifying" name="lost-identifying" rows="3" maxlength="400"
+                    placeholder="Scratches, stickers, case, colour variation, markings, serial number..."></textarea>
+          <div class="hint">This will NOT be shown publicly.</div>
+        </div>
+      </section>
+
+      <!-- SECTION 3: CONTACT -->
+      <section class="form-section">
+        <h2>3. Your Contact Information</h2>
+
+        <div class="field">
+          <label for="lost-student">Your name <span class="req">*</span></label>
+          <input type="text" id="lost-student" name="lost-student" maxlength="80" />
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="lost-email">Email <span class="req">*</span></label>
+            <input type="email" id="lost-email" name="lost-email" />
+          </div>
+          <div class="field">
+            <label for="lost-phone">Phone <span class="req">*</span></label>
+            <input type="tel" id="lost-phone" name="lost-phone" />
+          </div>
+        </div>
+      </section>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Report Lost Item</button>
+        <button type="reset"  class="btn btn-ghost">Reset</button>
+      </div>
+
+    </form>
+          <!-- ================= MY PAST LOST REPORTS ================= -->
+    <section class="form-section my-reports">
+      <h2>My Lost Item Reports</h2>
+      <p class="hint">
+        These are your reports. If you recover an item, mark it here —
+        it will be hidden from public listings but kept in your history.
+      </p>
+      <div id="my-lost-reports" class="status-list"></div>
+    </section>
+  </main>
+
+
+  <script src="../js/item-actions.js"></script>
+  <script src="../js/forms.js"></script>
+</body>
+</html>
