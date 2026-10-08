@@ -1,0 +1,10 @@
+/* =========================================================
+   My Items – page specific
+   (tabs, search, cards, pills and empty state come from components.css)
+   ========================================================= */
+
+/* Logged-out message sits in the middle of the page */
+.auth-gate {
+  min-height: 55vh;
+  margin-top: 8px;
+}

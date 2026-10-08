@@ -10,19 +10,21 @@
 <body>
   <header class="navbar">
     <nav class="nav-inner">
-      <a href="../index.html" class="nav-logo">FindIt</a>
+      <a href="../index.html" class="nav-logo">
+        <img src="../assets/images/FindIt_logo.png" alt="FindIt logo">
+      </a>
       <div class="nav-menu">
         <ul class="nav-links">
           <li><a href="../index.html">Home</a></li>
           <li><a href="items.html">Browse Items</a></li>
           <li><a href="report-lost.html">Report Lost</a></li>
           <li><a href="report-found.html">Report Found</a></li>
-          <li><a href="office.html">Campus Office</a></li>
-          <li><a href="dashboard.html">Dashboard</a></li>
+          <li data-auth="in" hidden><a href="my-items.html">My Items</a></li>
         </ul>
         <div class="nav-actions">
-          <a href="login.html" class="btn btn-outline">Login</a>
-          <a href="signup.html" class="btn btn-primary">Sign Up</a>
+          <a href="login.html" class="btn btn-outline" data-auth="out">Login</a>
+          <a href="signup.html" class="btn btn-primary" data-auth="out">Sign Up</a>
+          <button type="button" class="btn btn-outline" data-auth="in" data-logout hidden>Logout</button>
         </div>
       </div>
     </nav>
