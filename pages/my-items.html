@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Items | FindIt</title>
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/my-items.css">
+</head>
+<body>
+  <header class="navbar">
+    <nav class="nav-inner">
+      <a href="../index.html" class="nav-logo">
+        <img src="../assets/images/FindIt_logo.png" alt="FindIt logo">
+      </a>
+      <div class="nav-menu">
+        <ul class="nav-links">
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="items.html">Browse Items</a></li>
+          <li><a href="report-lost.html">Report Lost</a></li>
+          <li><a href="report-found.html">Report Found</a></li>
+          <li data-auth="in" hidden><a href="my-items.html" class="active">My Items</a></li>
+        </ul>
+        <div class="nav-actions">
+          <a href="login.html" class="btn btn-outline" data-auth="out">Login</a>
+          <a href="signup.html" class="btn btn-primary" data-auth="out">Sign Up</a>
+          <button type="button" class="btn btn-outline" data-auth="in" data-logout hidden>Logout</button>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <!-- Shown when the user is NOT logged in -->
+    <section class="empty-state auth-gate" id="auth-gate" hidden>
+      <div class="empty-icon" aria-hidden="true">🔒</div>
+      <h3>Log in to see your items</h3>
+      <p>Your lost and found reports are saved to your account. Log in or create an account to view and manage them.</p>
+      <div class="empty-actions">
+        <a href="login.html" class="btn btn-primary">Log In</a>
+        <a href="signup.html" class="btn btn-outline">Sign Up</a>
+      </div>
+    </section>
+
+    <!-- Shown when the user IS logged in -->
+    <section id="my-items-content" hidden>
+
+      <div class="page-head">
+        <div>
+          <h1>My Items</h1>
+          <p class="page-sub" id="welcome-text">Everything you've reported lost or found.</p>
+        </div>
+        <div class="page-head-actions">
+          <a href="report-lost.html" class="btn btn-outline">Report Lost Item</a>
+          <a href="report-found.html" class="btn btn-primary">Report Found Item</a>
+        </div>
+      </div>
+
+      <div class="tabs" id="my-tabs" role="tablist" aria-label="My items">
+        <button type="button" class="tab active" role="tab" data-tab="lost">My Lost Items <span class="tab-count" id="count-lost">0</span></button>
+        <button type="button" class="tab" role="tab" data-tab="found">My Found Items <span class="tab-count" id="count-found">0</span></button>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" id="my-search" placeholder="Search your items…" aria-label="Search your items">
+        </div>
+      </div>
+
+      <div class="item-grid" id="my-grid" aria-live="polite"></div>
+
+    </section>
+
+  </main>
+
+  <script src="../js/app.js"></script>
+  <script src="../js/my-items.js"></script>
+</body>
+</html>
