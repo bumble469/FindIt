@@ -1,15 +1,3 @@
-// app.js – shared code for every page
-// 1) login-aware UI   2) helpers + item-card builder used by Browse Items & My Items
-
-/* =========================================================
-   1. LOGIN STATE
-   Placeholder until real auth is connected: a user is "logged in"
-   when localStorage has a "findit_user" entry.
-   Elements with data-auth="in"  -> shown only when logged in
-   Elements with data-auth="out" -> shown only when logged out
-   Elements with data-logout     -> click to log out
-   ========================================================= */
-
 const AUTH_KEY = 'findit_user';
 
 function getCurrentUser() {
@@ -29,8 +17,6 @@ function logout() {
   window.location.reload();
 }
 
-// DEV ONLY – remove once real login exists.
-// Open any page with ?demo=login or ?demo=logout to switch state quickly.
 (function demoSwitch() {
   const demo = new URLSearchParams(window.location.search).get('demo');
   if (demo === 'login') {
@@ -51,18 +37,12 @@ function applyAuthState() {
 
 applyAuthState();
 
-
-/* =========================================================
-   2. SHARED HELPERS
-   ========================================================= */
-
 function escapeHTML(text) {
   const div = document.createElement('div');
   div.textContent = String(text ?? '');
   return div.innerHTML;
 }
 
-// ISO date string for "n days ago" (handy for dummy data)
 function daysAgo(n) {
   const d = new Date();
   d.setDate(d.getDate() - n);
@@ -85,7 +65,6 @@ function timeAgo(iso) {
   return months + (months === 1 ? ' month ago' : ' months ago');
 }
 
-// Placeholder picture (emoji on a soft colour) – swap for real image paths later
 function placeholderImage(emoji, bg) {
   const svg =
     "<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'>" +
@@ -94,13 +73,6 @@ function placeholderImage(emoji, bg) {
     emoji + "</text></svg>";
   return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
 }
-
-
-/* =========================================================
-   3. ITEM CARD (used by items.js and my-items.js)
-   item = { id, type: 'lost'|'found', title, category, location,
-            date (ISO), status: 'open'|'office'|'pending'|'returned', image }
-   ========================================================= */
 
 const STATUS_META = {
   open:     { lost: 'Still missing', found: 'Unclaimed',         cls: 'pill-open' },
@@ -114,25 +86,65 @@ function buildItemCard(item, actionsHTML) {
   const typeLabel = item.type === 'lost' ? 'Lost' : 'Found';
   const url = 'item-details.html?id=' + encodeURIComponent(item.id);
 
+  const description =
+    item.description ||
+    typeLabel +
+      ' at ' +
+      item.location +
+      ' on ' +
+      formatDate(item.date) +
+      ' (' +
+      timeAgo(item.date) +
+      ').';
+
   return `
     <article class="item-card">
-      <a class="item-media" href="${url}" aria-label="View ${escapeHTML(item.title)}">
-        <img src="${item.image}" alt="${escapeHTML(item.title)}" loading="lazy">
-        <div class="item-pills">
-          <span class="pill pill-${item.type}">${typeLabel}</span>
-          <span class="pill ${status.cls}">${status[item.type]}</span>
-        </div>
+      <a
+        class="item-media"
+        href="${url}"
+        aria-label="View ${escapeHTML(item.title)}"
+      >
+        <img
+          src="${item.image}"
+          alt="${escapeHTML(item.title)}"
+          loading="lazy"
+        >
       </a>
+
+
       <div class="item-body">
-        <span class="item-category">${escapeHTML(item.category)}</span>
-        <h3 class="item-title"><a href="${url}">${escapeHTML(item.title)}</a></h3>
-        <ul class="item-meta">
-          <li><span aria-hidden="true">📍</span> ${escapeHTML(item.location)}</li>
-          <li><span aria-hidden="true">📅</span> ${formatDate(item.date)} · ${timeAgo(item.date)}</li>
-        </ul>
-        <div class="item-actions">${actionsHTML || ''}</div>
+        <h3 class="item-title">
+          <a href="${url}">
+            ${escapeHTML(item.title)}
+          </a>
+        </h3>
+
+        <p class="item-desc">
+          ${escapeHTML(description)}
+        </p>
+
+        <div class="item-tags">
+          <span class="tag">
+            ${escapeHTML(item.category)}
+          </span>
+          <span class="tag tag-outline">
+            ${typeLabel}
+          </span>
+        </div>
+
+        <p class="item-status">
+          <span class="status-dot dot-${item.status}"></span>
+          ${escapeHTML(status[item.type] || item.status)}
+        </p>
+
+        <div class="item-actions">
+          ${actionsHTML || ''}
+        </div>
+
       </div>
-    </article>`;
+
+    </article>
+  `;
 }
 
 function buildEmptyState({ icon, title, text, actionsHTML }) {

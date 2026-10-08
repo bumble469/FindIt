@@ -31,36 +31,56 @@
     </nav>
   </header>
 
-  <main class="container">
-
-    <div class="page-head">
-      <div>
+  <!-- ===== Banner: title left, search + filter right ===== -->
+  <section class="browse-hero">
+    <div class="hero-inner">
+      <div class="hero-title">
         <h1>Browse Items</h1>
-        <p class="page-sub">Search everything reported lost or found on campus.</p>
+        <p>Search everything reported lost or found on campus.</p>
       </div>
-      <div class="page-head-actions">
-        <a href="report-lost.html" class="btn btn-outline">Report Lost Item</a>
-        <a href="report-found.html" class="btn btn-primary">Report Found Item</a>
+
+      <div class="hero-tools">
+        <div class="hero-search">
+          <input type="search" id="search" placeholder="Search items, locations or categories" aria-label="Search items">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        </div>
+        <button type="button" class="filter-btn" id="filters-toggle" aria-expanded="false" aria-controls="filters">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h18l-7 8.5V19l-4 2v-8.5L3 4z"/></svg>
+          Filter
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <main class="container browse-main">
+
+    <!-- Tabs (type) on the left, sort + view toggle on the right -->
+    <div class="browse-bar">
+      <div class="tabs" id="type-tabs" role="tablist" aria-label="Item type">
+        <button type="button" class="tab active" role="tab" data-type="all">All <span class="tab-count" id="count-all">0</span></button>
+        <button type="button" class="tab" role="tab" data-type="lost">Lost <span class="tab-count" id="count-lost">0</span></button>
+        <button type="button" class="tab" role="tab" data-type="found">Found <span class="tab-count" id="count-found">0</span></button>
+      </div>
+
+      <div class="results-tools">
+        <label for="filter-sort">Sort by:</label>
+        <select id="filter-sort" class="sort-select">
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+        </select>
+
+        <div class="view-toggle" role="group" aria-label="View">
+          <button type="button" class="active" data-view="grid" aria-pressed="true" aria-label="Grid view">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          </button>
+          <button type="button" data-view="list" aria-pressed="false" aria-label="List view">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- Type filter -->
-    <div class="tabs" id="type-tabs" role="tablist" aria-label="Item type">
-      <button type="button" class="tab active" role="tab" data-type="all">All <span class="tab-count" id="count-all">0</span></button>
-      <button type="button" class="tab" role="tab" data-type="lost">Lost <span class="tab-count" id="count-lost">0</span></button>
-      <button type="button" class="tab" role="tab" data-type="found">Found <span class="tab-count" id="count-found">0</span></button>
-    </div>
-
-    <!-- Search -->
-    <div class="toolbar">
-      <div class="search-box">
-        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-        <input type="search" id="search" placeholder="Search by item, location or category…" aria-label="Search items">
-      </div>
-      <button type="button" class="btn btn-outline filters-toggle" id="filters-toggle" aria-expanded="false" aria-controls="filters">Filters</button>
-    </div>
-
-    <!-- Filters: status, date, category, sort -->
+    <!-- Filter panel (opens with the Filter button) -->
     <div class="filters" id="filters">
       <div class="filter">
         <label for="filter-status">Status</label>
@@ -93,18 +113,12 @@
           <option>Other</option>
         </select>
       </div>
-      <div class="filter">
-        <label for="filter-sort">Sort by</label>
-        <select id="filter-sort">
-          <option value="newest">Newest first</option>
-          <option value="oldest">Oldest first</option>
-        </select>
-      </div>
       <button type="button" class="btn btn-ghost filter-clear" id="clear-filters">Clear filters</button>
     </div>
 
-    <div class="results-meta">
-      <span id="result-count" aria-live="polite"></span>
+    <!-- Result count -->
+    <div class="results-bar">
+      <span class="result-count" id="result-count" aria-live="polite"></span>
     </div>
 
     <div class="item-grid" id="items-grid"></div>
