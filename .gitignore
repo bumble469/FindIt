@@ -11,3 +11,5 @@ Thumbs.db
 
 # VS Code
 .vscode/
+
+seed-items.js

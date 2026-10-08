@@ -1,14 +1,7 @@
-/* =========================================
-   REPORT LOST ITEM PAGE
-   Page-specific form styles only.
-   Crisp / institutional form style.
-   Colours, fonts and navbar come from global.css
-========================================= */
-
 .container {
-  max-width: 1000px;
+  max-width: 1450px;
   margin: 0 auto;
-  padding: 40px 24px 70px;
+  padding: 2.5rem 2.5rem;
 }
 
 /* =========================================
@@ -99,6 +92,90 @@
 
 .form-section h2::after {
   content: none;
+}
+
+/* =========================================================
+   FORM STEPPER
+   ========================================================= */
+
+.form-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-bottom: 16px;
+  border: 1px solid #CBD5D0;
+  background: var(--white);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.form-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 16px;
+  border: 0;
+  border-right: 1px solid #CBD5D0;
+  background: var(--white);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.form-tab:last-child {
+  border-right: 0;
+}
+
+.form-tab span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--off-white);
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.form-tab.active {
+  background: var(--light-green);
+  color: var(--deep-green);
+}
+
+.form-tab.active span {
+  background: var(--deep-green);
+  color: var(--white);
+}
+
+.form-step {
+  display: none;
+}
+
+.form-step.active {
+  display: block;
+}
+
+.form-step .form-section {
+  margin-bottom: 0;
+  min-height: 390px;
+}
+
+.step-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #CBD5D0;
+}
+
+.step-actions .btn-primary {
+  min-width: 130px;
 }
 
 
@@ -342,7 +419,6 @@
 ========================================= */
 
 @media (max-width: 768px) {
-
   .container {
     padding: 30px 16px 50px;
   }
@@ -366,6 +442,33 @@
 
   .preview-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+
+  .form-tabs {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .form-tab {
+    padding: 10px 6px;
+    font-size: 0.75rem;
+  }
+
+  .form-tab span {
+    width: 21px;
+    height: 21px;
+    font-size: 0.68rem;
+  }
+
+  .form-step .form-section {
+    min-height: auto;
+  }
+
+  .step-actions {
+    flex-wrap: wrap;
+  }
+
+  .step-actions .btn {
+    flex: 1;
   }
 }
 
