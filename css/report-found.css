@@ -1,29 +1,26 @@
 /* =========================================================
    FindIt — Report Found Item
-   Clean, user-friendly styles
+   Page-specific form styles only.
+   Crisp / institutional form style.
+   Colours, fonts and navbar come from global.css
    ========================================================= */
 
-/* ---------- Design Tokens ---------- */
+/* ---------- Page tokens (mapped to the global green theme) ---------- */
 :root {
-  --color-bg: #f6f8fb;
-  --color-surface: #ffffff;
-  --color-border: #e2e8f0;
-  --color-border-strong: #cbd5e1;
-  --color-text: #1e293b;
-  --color-text-muted: #64748b;
-  --color-primary: #2563eb;
-  --color-primary-dark: #1d4ed8;
-  --color-primary-soft: #eff6ff;
-  --color-danger: #dc2626;
-  --color-success: #16a34a;
+  --color-surface: var(--white);
+  --color-border: #CBD5D0;
+  --color-border-strong: #B9C5BF;
+  --color-text: var(--dark-text);
+  --color-text-muted: var(--muted);
+  --color-primary: var(--deep-green);
+  --color-primary-dark: var(--deep-green);
+  --color-primary-soft: var(--light-green);
+  --color-danger: #B91C1C;
+  --color-success: #15803D;
 
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 14px;
-
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
-  --shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
-  --shadow-lg: 0 10px 30px rgba(15, 23, 42, 0.1);
+  --radius: 4px;
+  --radius-sm: 3px;
+  --radius-lg: 4px;
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -32,30 +29,10 @@
   --space-5: 1.5rem;
   --space-6: 2rem;
   --space-7: 3rem;
-
-  --font-sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial,
-    sans-serif;
-}
-
-/* ---------- Reset ---------- */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
 }
 
 html {
   scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: 16px;
-  line-height: 1.6;
-  color: var(--color-text);
-  background: var(--color-bg);
-  -webkit-font-smoothing: antialiased;
 }
 
 img {
@@ -63,186 +40,11 @@ img {
   display: block;
 }
 
-/* ---------- Layout Helpers ---------- */
+/* ---------- Layout ---------- */
 .container {
-  width: 100%;
-  max-width: 1080px;
-  margin-inline: auto;
-  padding-inline: var(--space-4);
-}
-
-.page {
-  padding-block: var(--space-6) var(--space-7);
-}
-
-/* =========================================================
-   HEADER / NAVBAR
-   ========================================================= */
-.site-header,
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
-  box-shadow: var(--shadow-sm);
-}
-
-.nav-inner,
-.site-header .container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  max-width: 1080px;
-  margin-inline: auto;
-  padding: var(--space-3) var(--space-4);
-}
-
-.logo,
-.nav-logo {
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: var(--color-primary);
-  text-decoration: none;
-  letter-spacing: -0.02em;
-}
-
-.logo:hover,
-.nav-logo:hover {
-  color: var(--color-primary-dark);
-}
-
-.site-header nav {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  flex-wrap: wrap;
-}
-
-.site-header nav a {
-  color: var(--color-text-muted);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 0.95rem;
-  padding: var(--space-1) 0;
-  border-bottom: 2px solid transparent;
-  transition: color 0.15s ease, border-color 0.15s ease;
-}
-
-.site-header nav a:hover {
-  color: var(--color-primary);
-}
-
-.site-header nav a.active {
-  color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
-}
-
-/* Alternate navbar markup (nav-menu / nav-links / nav-actions) */
-.nav-menu {
-  display: flex;
-  align-items: center;
-  gap: var(--space-5);
-  flex-wrap: wrap;
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  flex-wrap: wrap;
-}
-
-.nav-links a {
-  color: var(--color-text-muted);
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 0.95rem;
-  padding: var(--space-1) 0;
-  border-bottom: 2px solid transparent;
-  transition: color 0.15s ease, border-color 0.15s ease;
-}
-
-.nav-links a:hover {
-  color: var(--color-primary);
-}
-
-.nav-links a.active {
-  color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
-}
-
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-}
-
-/* =========================================================
-   BUTTONS
-   ========================================================= */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: 0.65rem 1.25rem;
-  font: inherit;
-  font-weight: 600;
-  font-size: 0.95rem;
-  line-height: 1;
-  border-radius: var(--radius);
-  border: 1px solid transparent;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background-color 0.15s ease, color 0.15s ease,
-    border-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
-}
-
-.btn:active {
-  transform: translateY(1px);
-}
-
-.btn:focus-visible {
-  outline: 3px solid var(--color-primary-soft);
-  outline-offset: 2px;
-}
-
-.btn-primary {
-  background: var(--color-primary);
-  color: #fff;
-  box-shadow: var(--shadow-sm);
-}
-
-.btn-primary:hover {
-  background: var(--color-primary-dark);
-  box-shadow: var(--shadow);
-}
-
-.btn-outline {
-  background: transparent;
-  color: var(--color-primary);
-  border-color: var(--color-border-strong);
-}
-
-.btn-outline:hover {
-  background: var(--color-primary-soft);
-  border-color: var(--color-primary);
-}
-
-.btn-ghost {
-  background: transparent;
-  color: var(--color-text-muted);
-  border-color: transparent;
-}
-
-.btn-ghost:hover {
-  background: #eef2f7;
-  color: var(--color-text);
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 24px 70px;
 }
 
 /* =========================================================
@@ -250,18 +52,53 @@ img {
    ========================================================= */
 .page h1,
 main.container > h1 {
-  font-size: clamp(1.6rem, 2.5vw, 2.1rem);
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.5rem, 2.5vw, 1.9rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
   margin: 0 0 var(--space-2);
-  color: var(--color-text);
+  padding-bottom: var(--space-3);
+  border-bottom: 2px solid var(--deep-green);
+  color: var(--deep-green);
 }
 
 .page-subtitle {
-  margin: 0 0 var(--space-6);
+  margin: var(--space-4) 0 var(--space-5);
   color: var(--color-text-muted);
   font-size: 1rem;
   max-width: 60ch;
+}
+
+/* =========================================================
+   BUTTONS (page content only; navbar untouched)
+   ========================================================= */
+.container .btn {
+  padding: 11px 20px;
+  border-radius: 4px;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.container .btn-primary {
+  background: var(--deep-green);
+  border-color: var(--deep-green);
+  color: var(--white);
+}
+
+.container .btn-primary:hover {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.container .btn-ghost {
+  background: var(--white);
+  border: 1px solid var(--color-border-strong);
+  color: var(--dark-text);
+}
+
+.container .btn-ghost:hover {
+  background: var(--light-green);
+  border-color: var(--deep-green);
+  color: var(--deep-green);
 }
 
 /* =========================================================
@@ -270,26 +107,27 @@ main.container > h1 {
 .form-section {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
+  border-top: 3px solid var(--deep-green);
   border-radius: var(--radius-lg);
   padding: var(--space-5);
   margin-bottom: var(--space-5);
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
 }
 
 .form-section h2 {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
   font-weight: 700;
   margin: 0 0 var(--space-4);
   padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--color-border);
-  color: var(--color-text);
+  border-bottom: 1px solid var(--border);
+  color: var(--deep-green);
 }
 
 .form-section h3 {
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   margin: var(--space-5) 0 var(--space-3);
-  color: var(--color-text);
+  color: var(--deep-green);
 }
 
 /* ---------- Fields ---------- */
@@ -299,9 +137,10 @@ main.container > h1 {
 
 .field label {
   display: block;
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: var(--space-2);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  margin-bottom: 6px;
   color: var(--color-text);
 }
 
@@ -319,11 +158,11 @@ main.container > h1 {
 .field select,
 .field textarea {
   width: 100%;
-  padding: 0.65rem 0.85rem;
+  padding: 0.65rem 0.8rem;
   font: inherit;
   font-size: 0.95rem;
   color: var(--color-text);
-  background: #fff;
+  background: var(--white);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -338,18 +177,19 @@ main.container > h1 {
 .field select:focus,
 .field textarea:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-soft);
+  border-color: var(--deep-green);
+  box-shadow: 0 0 0 2px rgba(39, 103, 73, 0.25);
 }
 
 .field input::placeholder,
 .field textarea::placeholder {
-  color: #94a3b8;
+  color: #8A9692;
 }
 
 .field input[type="file"] {
-  padding: 0.5rem;
-  background: #f8fafc;
+  padding: 0.55rem;
+  background: var(--off-white);
+  border: 1px dashed #8FA79B;
   cursor: pointer;
 }
 
@@ -362,7 +202,7 @@ main.container > h1 {
 
 /* ---------- Hints ---------- */
 .hint {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   color: var(--color-text-muted);
   margin: 0 0 var(--space-3);
 }
@@ -401,22 +241,21 @@ main.container > h1 {
   align-items: flex-start;
   gap: var(--space-3);
   padding: var(--space-4);
-  background: #fbfdff;
-  border: 2px solid var(--color-border);
+  background: var(--white);
+  border: 1px solid var(--color-border-strong);
   border-radius: var(--radius);
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease,
-    box-shadow 0.15s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .radio-card:hover {
-  border-color: var(--color-primary);
-  background: var(--color-primary-soft);
+  border-color: var(--deep-green);
+  background: var(--off-white);
 }
 
 .radio-card input[type="radio"] {
   margin-top: 0.25rem;
-  accent-color: var(--color-primary);
+  accent-color: var(--deep-green);
   width: 1.1rem;
   height: 1.1rem;
   flex-shrink: 0;
@@ -436,30 +275,30 @@ main.container > h1 {
 }
 
 .radio-card small {
-  font-size: 0.825rem;
+  font-size: 0.82rem;
   color: var(--color-text-muted);
   line-height: 1.45;
 }
 
 /* Checked state */
 .radio-card:has(input[type="radio"]:checked) {
-  border-color: var(--color-primary);
-  background: var(--color-primary-soft);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  border-color: var(--deep-green);
+  background: var(--light-green);
+  box-shadow: inset 3px 0 0 var(--deep-green);
 }
 
 /* Fallback for browsers without :has() */
 .radio-card input[type="radio"]:checked ~ span strong {
-  color: var(--color-primary-dark);
+  color: var(--deep-green);
 }
 
 /* =========================================================
    OFFICE CARD
    ========================================================= */
 .office-card {
-  background: #f8fafc;
+  background: var(--off-white);
   border: 1px solid var(--color-border);
-  border-left: 4px solid var(--color-primary);
+  border-left: 4px solid var(--deep-green);
   border-radius: var(--radius);
   padding: var(--space-4);
 }
@@ -512,22 +351,24 @@ main.container > h1 {
 .status-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
+  border-left: 3px solid var(--deep-green);
   border-radius: var(--radius);
   padding: var(--space-4);
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  box-shadow: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .status-card:hover {
-  box-shadow: var(--shadow);
-  transform: translateY(-1px);
+  border-color: var(--deep-green);
+  box-shadow: 0 2px 6px rgba(23, 63, 53, 0.12);
+  transform: none;
 }
 
 .status-card h3 {
   font-size: 1rem;
   font-weight: 700;
   margin: 0 0 var(--space-1);
-  color: var(--color-text);
+  color: var(--deep-green);
 }
 
 .status-card .meta {
@@ -538,24 +379,27 @@ main.container > h1 {
 
 .status-badge {
   display: inline-block;
-  font-size: 0.75rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  padding: 0.2rem 0.6rem;
-  border-radius: 999px;
-  background: var(--color-primary-soft);
-  color: var(--color-primary-dark);
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid #B5D8C2;
+  border-radius: 3px;
+  background: var(--light-green);
+  color: var(--deep-green);
 }
 
 .status-badge.status-claimed {
-  background: #dcfce7;
-  color: #166534;
+  background: var(--deep-green);
+  border-color: var(--deep-green);
+  color: var(--white);
 }
 
 .status-badge.status-office {
-  background: #fef9c3;
-  color: #854d0e;
+  background: #FEF3C7;
+  border-color: #F2DB92;
+  color: #78350F;
 }
 
 /* =========================================================
@@ -570,18 +414,6 @@ main.container > h1 {
     grid-template-columns: 1fr;
   }
 
-  .nav-menu {
-    gap: var(--space-3);
-  }
-
-  .nav-links {
-    gap: var(--space-3);
-  }
-
-  .nav-actions {
-    gap: var(--space-2);
-  }
-
   .form-section {
     padding: var(--space-4);
   }
@@ -593,44 +425,6 @@ main.container > h1 {
 
   .form-actions .btn {
     width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  body {
-    font-size: 15px;
-  }
-
-  .nav-inner,
-  .site-header .container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-3);
-  }
-
-  .site-header nav {
-    width: 100%;
-    justify-content: flex-start;
-  }
-
-  .nav-menu {
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .nav-links {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-2);
-  }
-
-  .nav-actions {
-    width: 100%;
-  }
-
-  .nav-actions .btn {
-    flex: 1;
   }
 }
 
@@ -654,6 +448,6 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid var(--color-primary-soft);
+  outline: 2px solid var(--gold);
   outline-offset: 2px;
 }

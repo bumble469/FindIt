@@ -1,1 +1,73 @@
-.container h1 { margin-bottom: 1.25rem; }
+/* =========================================================
+   Browse Items – filters panel
+   ========================================================= */
+
+.filters-toggle {
+  display: none;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: var(--white);
+  border: 1px solid #CBD5D0;
+  border-left: 3px solid var(--deep-green);
+  border-radius: 4px;
+}
+
+.filter label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--deep-green);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.filter select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #B9C5BF;
+  border-radius: 4px;
+  background: var(--white);
+  color: var(--dark-text);
+  font: inherit;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.filter select:focus {
+  outline: none;
+  border-color: var(--deep-green);
+  box-shadow: 0 0 0 2px rgba(39, 103, 73, 0.25);
+}
+
+@media (max-width: 960px) {
+  .filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filter-clear {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 700px) {
+  .filters-toggle {
+    display: inline-flex;
+  }
+
+  /* Filters tuck away behind the Filters button on phones */
+  .filters {
+    display: none;
+  }
+
+  .filters.open {
+    display: grid;
+  }
+}
