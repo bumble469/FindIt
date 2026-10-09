@@ -75,11 +75,10 @@ a {
    ========================= */
 
 .container {
-  max-width: 1100px;
+  max-width: 1450px;
   margin: 0 auto;
-  padding: 32px 20px;
+  padding: 5rem 2.5rem;
 }
-
 
 /* =========================
    BUTTONS
@@ -103,7 +102,6 @@ a {
 
 
 /* Primary button */
-
 .btn-primary {
   background: var(--green);
   color: var(--white);
@@ -158,25 +156,19 @@ a {
   top: 0;
   z-index: 100;
   min-height: var(--nav-height);
-
-  /* White navbar instead of large green block */
   background: var(--white);
-
   border-bottom: 1px solid var(--border);
 }
 
 .nav-inner {
-  max-width: 1100px;
+  width: 100%;
   min-height: var(--nav-height);
-  margin: 0 auto;
-  padding: 0 20px;
-
+  margin: 0;
+  padding: 0 32px;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;   /* logo | links | buttons */
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 20px;
 }
-
 
 /* =========================
    LOGO
@@ -185,16 +177,14 @@ a {
 .nav-logo {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
   justify-self: start;
-
   font-size: 1.4rem;
   font-weight: 800;
   color: var(--deep-green);
 }
 
 .nav-logo img {
-  height: 56px;   /* logo size - change this number to resize */
+  height: 5rem;
   width: auto;
   display: block;
 }
@@ -204,7 +194,7 @@ a {
    ========================= */
 
 .nav-menu {
-  display: contents;   /* links and buttons become grid items of .nav-inner */
+  display: contents;
 }
 
 .nav-links,
@@ -228,26 +218,18 @@ a {
   display: block;
   padding: 8px 12px;
   border-radius: 8px;
-
   color: var(--muted);
   font-weight: 500;
   white-space: nowrap;
-
   transition:
     background 0.15s ease,
     color 0.15s ease;
 }
 
-
-/* Hover */
-
 .nav-links a:hover {
   background: var(--light-green);
   color: var(--deep-green);
 }
-
-
-/* Active */
 
 .nav-links a.active {
   color: var(--deep-green);

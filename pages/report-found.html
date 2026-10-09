@@ -39,16 +39,39 @@
 
     <form id="form-found" novalidate>
 
-      <section class="form-section">
-        <h2>1. Item Information</h2>
+  <div class="form-tabs">
+    <button type="button" class="form-tab active" data-step="1">
+      <span>1</span>
+      Item Information
+    </button>
 
+    <button type="button" class="form-tab" data-step="2">
+      <span>2</span>
+      Location
+    </button>
+
+    <button type="button" class="form-tab" data-step="3">
+      <span>3</span>
+      Item Status
+    </button>
+  </div>
+
+  <div class="form-step active" data-step="1">
+    <section class="form-section">
+      <h2>Item Information</h2>
+
+      <div class="field-row">
         <div class="field">
-          <label for="found-name">Item name <span class="req">*</span></label>
+          <label for="found-name">
+            Item name <span class="req">*</span>
+          </label>
           <input type="text" id="found-name" maxlength="80" />
         </div>
 
         <div class="field">
-          <label for="found-category">Category <span class="req">*</span></label>
+          <label for="found-category">
+            Category <span class="req">*</span>
+          </label>
           <select id="found-category">
             <option value="">— Select —</option>
             <option>Electronics</option>
@@ -59,95 +82,154 @@
             <option>Other</option>
           </select>
         </div>
+      </div>
+
+      <div class="field">
+        <label for="found-desc">
+          Description <span class="req">*</span>
+        </label>
+        <textarea id="found-desc" rows="4" maxlength="500"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="found-photo">Photo of the found item</label>
+        <input type="file" id="found-photo" accept="image/*" />
+        <div id="found-photo-preview" class="preview-grid"></div>
+      </div>
+
+      <div class="field">
+        <label for="found-additional">Additional details</label>
+        <textarea id="found-additional" rows="3" maxlength="400"></textarea>
+      </div>
+    </section>
+
+    <div class="step-actions">
+      <button type="button" class="btn btn-primary next-step" data-next="2">
+        Next
+      </button>
+    </div>
+  </div>
+
+  <div class="form-step" data-step="2">
+    <section class="form-section">
+      <h2>Where was the item found?</h2>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="found-date">
+            Date found <span class="req">*</span>
+          </label>
+          <input type="date" id="found-date" />
+        </div>
 
         <div class="field">
-          <label for="found-desc">Description <span class="req">*</span></label>
-          <textarea id="found-desc" rows="4" maxlength="500"></textarea>
+          <label for="found-time">Approximate time</label>
+          <input type="time" id="found-time" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="found-location">
+          Location where it was found <span class="req">*</span>
+        </label>
+        <input type="text" id="found-location" maxlength="120" />
+      </div>
+    </section>
+
+    <div class="step-actions">
+      <button type="button" class="btn btn-ghost prev-step" data-prev="1">
+        Back
+      </button>
+
+      <button type="button" class="btn btn-primary next-step" data-next="3">
+        Next
+      </button>
+    </div>
+  </div>
+
+  <div class="form-step" data-step="3">
+    <section class="form-section">
+      <h2>Where is the item now?</h2>
+
+      <div class="radio-group">
+        <label class="radio-card">
+          <input type="radio" name="found-possession" value="finder" />
+
+          <span>
+            <strong>I have the item</strong>
+            <small>You are currently holding it.</small>
+          </span>
+        </label>
+
+        <label class="radio-card">
+          <input type="radio" name="found-possession" value="office" />
+
+          <span>
+            <strong>Submitted to Campus Lost &amp; Found Office</strong>
+            <small>You handed it in at the official campus office.</small>
+          </span>
+        </label>
+      </div>
+
+      <div id="finder-contact-block" style="display:none;">
+        <h3>Your contact information</h3>
+
+        <div class="field">
+          <label for="found-finder-name">
+            Your name <span class="req">*</span>
+          </label>
+          <input type="text" id="found-finder-name" maxlength="80" />
         </div>
 
         <div class="field-row">
           <div class="field">
-            <label for="found-date">Date found <span class="req">*</span></label>
-            <input type="date" id="found-date" />
+            <label for="found-finder-email">
+              Email <span class="req">*</span>
+            </label>
+            <input type="email" id="found-finder-email" />
           </div>
+
           <div class="field">
-            <label for="found-time">Approximate time</label>
-            <input type="time" id="found-time" />
+            <label for="found-finder-phone">
+              Phone <span class="req">*</span>
+            </label>
+            <input type="tel" id="found-finder-phone" />
           </div>
         </div>
-
-        <div class="field">
-          <label for="found-location">Location where it was found <span class="req">*</span></label>
-          <input type="text" id="found-location" maxlength="120" />
-        </div>
-
-        <div class="field">
-          <label for="found-photo">Photo of the found item</label>
-          <input type="file" id="found-photo" accept="image/*" />
-          <div id="found-photo-preview" class="preview-grid"></div>
-        </div>
-
-        <div class="field">
-          <label for="found-additional">Additional details</label>
-          <textarea id="found-additional" rows="3" maxlength="400"></textarea>
-        </div>
-      </section>
-
-      <section class="form-section">
-        <h2>2. Where is the item now?</h2>
-
-        <div class="radio-group">
-          <label class="radio-card">
-            <input type="radio" name="found-possession" value="finder" />
-            <span>
-              <strong>I have the item</strong>
-              <small>You are currently holding it.</small>
-            </span>
-          </label>
-          <label class="radio-card">
-            <input type="radio" name="found-possession" value="office" />
-            <span>
-              <strong>Submitted to Campus Lost &amp; Found Office</strong>
-              <small>You handed it in at the official campus office.</small>
-            </span>
-          </label>
-        </div>
-
-        <div id="finder-contact-block" style="display:none;">
-          <h3>Your contact information</h3>
-          <div class="field">
-            <label for="found-finder-name">Your name <span class="req">*</span></label>
-            <input type="text" id="found-finder-name" maxlength="80" />
-          </div>
-          <div class="field-row">
-            <div class="field">
-              <label for="found-finder-email">Email <span class="req">*</span></label>
-              <input type="email" id="found-finder-email" />
-            </div>
-            <div class="field">
-              <label for="found-finder-phone">Phone <span class="req">*</span></label>
-              <input type="tel" id="found-finder-phone" />
-            </div>
-          </div>
-        </div>
-
-        <div id="office-info-block" style="display:none;">
-          <h3>Campus Lost &amp; Found Office</h3>
-          <p class="hint">Auto-populated — no need to type anything.</p>
-          <div class="office-card">
-            <p><strong id="office-name"></strong></p>
-            <p>📍 <span id="office-address"></span></p>
-            <p>🕘 <span id="office-hours"></span></p>
-            <p>✉️ <span id="office-contact"></span></p>
-          </div>
-        </div>
-      </section>
-
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Report Found Item</button>
-        <button type="reset"  class="btn btn-ghost">Reset</button>
       </div>
-    </form>
+
+      <div id="office-info-block" style="display:none;">
+        <h3>Campus Lost &amp; Found Office</h3>
+
+        <p class="hint">
+          Auto-populated — no need to type anything.
+        </p>
+
+        <div class="office-card">
+          <p><strong id="office-name"></strong></p>
+          <p>📍 <span id="office-address"></span></p>
+          <p>🕘 <span id="office-hours"></span></p>
+          <p>✉️ <span id="office-contact"></span></p>
+        </div>
+      </div>
+    </section>
+
+    <div class="step-actions">
+      <button type="button" class="btn btn-ghost prev-step" data-prev="2">
+        Back
+      </button>
+
+      <button type="submit" class="btn btn-primary">
+        Report Found Item
+      </button>
+
+      <button type="reset" class="btn btn-ghost">
+        Reset
+      </button>
+    </div>
+  </div>
+
+</form>
 
     <!-- ================= MY PAST FOUND REPORTS ================= -->
     <section class="form-section my-reports">
