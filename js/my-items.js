@@ -1,136 +1,352 @@
-// my-items.js – My Items page (dummy data, tabs + search)
-// Shows only for logged-in users. Replace the dummy arrays with real data later.
-// Tip: open the page with ?empty=1 to preview the "no items" state.
+// my-items.js – My Items page: profile + the user's lost and found reports (PocketBase)
 
 (function () {
-  const content = document.getElementById('my-items-content');
-  const gate = document.getElementById('auth-gate');
-  if (!content) return;
-
-  // Not logged in -> show the centred "log in" message and stop
-  if (!isLoggedIn()) {
-    gate.hidden = false;
-    return;
-  }
-  content.hidden = false;
+  const grid = document.getElementById('mi-grid');
+  if (!grid) return;
 
   const user = getCurrentUser();
-  if (user && user.name) {
-    document.getElementById('welcome-text').textContent =
-      'Hi ' + user.name.split(' ')[0] + ', here is everything you have reported lost or found.';
-  }
+  if (!user) return;                         // data-protected sends visitors to the login page
 
-  /* ---------------- Dummy data ---------------- */
-  const useEmpty = new URLSearchParams(window.location.search).get('empty') === '1';
+  /* ---------------- Settings ---------------- */
 
-  const data = useEmpty ? { lost: [], found: [] } : {
-    lost: [
-      { id: 101, type: 'lost', title: 'Navy blue backpack',     category: 'Bags',        location: 'Sports Complex',         date: daysAgo(4),  status: 'open',     image: placeholderImage('🎒', '#F3EBDD') },
-      { id: 102, type: 'lost', title: 'Prescription glasses',   category: 'Accessories', location: 'Science Lab 2',          date: daysAgo(15), status: 'pending',  image: placeholderImage('👓', '#E6F0E9') },
-      { id: 103, type: 'lost', title: 'Blue iPhone 13',         category: 'Electronics', location: 'Engineering Block',      date: daysAgo(2),  status: 'open',     image: placeholderImage('📱', '#E4EEF5') },
-      { id: 104, type: 'lost', title: 'Brown leather wallet',   category: 'Accessories', location: 'Bus stop near Gate 2',   date: daysAgo(20), status: 'returned', image: placeholderImage('👛', '#E6F0E9') },
-    ],
-    found: [
-      { id: 201, type: 'found', title: 'Black earbuds case',    category: 'Electronics', location: 'Central Library',        date: daysAgo(1),  status: 'open',     image: placeholderImage('🎧', '#E4EEF5') },
-      { id: 202, type: 'found', title: 'Keys with blue tag',    category: 'Other',       location: 'Visitor Parking',        date: daysAgo(12), status: 'returned', image: placeholderImage('🔑', '#EEF0EE') },
-      { id: 203, type: 'found', title: 'Student ID card',       category: 'Documents',   location: 'Main Cafeteria',         date: daysAgo(0),  status: 'office',   image: placeholderImage('🪪', '#EDE9F6') },
-    ],
+  const STAGE = { OPEN: 0, CLAIMED: 1, RESOLVED: 2 };
+  const STATUS_FILTER = { open: 'OPEN', progress: 'CLAIMED', resolved: 'RESOLVED' };
+  const PILL_CLASS = ['mi-pill--open', 'mi-pill--pending', 'mi-pill--done'];
+
+  const LABELS = {
+    lost: {
+      steps: ['Reported', 'Match found', 'Recovered'],
+      pill: ['Still missing', 'Match found', 'Recovered'],
+      resolve: 'Mark as recovered',
+    },
+    found: {
+      steps: ['Reported', 'Claim pending', 'Returned'],
+      pill: ['Unclaimed', 'Claim pending', 'Returned'],
+      resolve: 'Mark as returned',
+    },
   };
 
-  /* ---------------- State ---------------- */
-  const state = { tab: 'lost', q: '' };
+  const state = { items: [], tab: 'lost', status: 'all', q: '', loading: true, error: '' };
 
-  const grid = document.getElementById('my-grid');
-  const tabs = document.querySelectorAll('#my-tabs .tab');
-  const search = document.getElementById('my-search');
+  const tabs = document.querySelectorAll('.mi-tab');
+  const searchInput = document.getElementById('mi-search');
+  const statusSelect = document.getElementById('mi-status');
 
-  /* ---------------- Rendering ---------------- */
-  function actionsFor(item) {
-    const details = `<a class="btn btn-ghost btn-sm" href="item-details.html?id=${item.id}">Details</a>`;
+  /* ---------------- Profile ---------------- */
 
-    if (item.status === 'returned') {
-      const label = item.type === 'lost' ? 'Recovered' : 'Returned';
-      return `<button type="button" class="btn btn-outline btn-sm" disabled>${label}</button>${details}`;
+  function initials(name) {
+    return name.split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+  }
+
+  function renderProfile() {
+    const name = user.name || (user.email || 'You').split('@')[0];
+    document.getElementById('mi-name').textContent = name;
+    document.getElementById('mi-email').textContent = user.email || '';
+
+    const since = user.created ? new Date(String(user.created).replace(' ', 'T')) : null;
+    document.getElementById('mi-since').textContent = since && !isNaN(since)
+      ? 'Member since ' + since.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+      : 'FindIt member';
+
+    const avatar = document.getElementById('mi-avatar');
+    if (user.avatar) {
+      const img = document.createElement('img');
+      img.src = pb.files.getURL(user, user.avatar);
+      img.alt = '';
+      avatar.appendChild(img);
+    } else {
+      avatar.textContent = initials(name);
+    }
+  }
+
+  /* ---------------- Data ---------------- */
+
+  function mapItem(rec) {
+    const type = (rec.type || 'lost').toLowerCase();
+    return {
+      id: rec.id,
+      type,
+      title: rec.item_name || 'Untitled item',
+      description: rec.description || '',
+      category: rec.expand?.category?.name || '',
+      location: rec.location || 'Campus',
+      date: String(rec.datetime || rec.created).replace(' ', 'T'),
+      status: rec.status || 'OPEN',
+      custody: rec.custody || '',
+      image: rec.image
+        ? pb.files.getURL(rec, rec.image)
+        : placeholderImage(type === 'lost' ? '🔍' : '📦', type === 'lost' ? '#F3EBDD' : '#E6F0E9'),
+    };
+  }
+
+  async function loadItems() {
+    state.loading = true;
+    state.error = '';
+    render();
+
+    try {
+      const records = await pb.collection('items').getFullList({
+        filter: pb.filter('reported_by = {:uid}', { uid: user.id }),
+        expand: 'category',
+        sort: '-datetime',
+      });
+      state.items = records.map(mapItem);
+    } catch (err) {
+      console.error('Could not load your items:', err);
+      state.error = pbErrorMessage(err);
     }
 
-    const label = item.type === 'lost' ? 'Mark as recovered' : 'Mark as returned';
-    return `<button type="button" class="btn btn-primary btn-sm" data-resolve="${item.id}">${label}</button>${details}`;
+    state.loading = false;
+    render();
   }
 
-  function updateCounts() {
-    document.getElementById('count-lost').textContent = data.lost.length;
-    document.getElementById('count-found').textContent = data.found.length;
+  function visibleItems() {
+    const q = state.q.trim().toLowerCase();
+
+    return state.items
+      .filter((i) => i.type === state.tab)
+      .filter((i) => state.status === 'all' || i.status === STATUS_FILTER[state.status])
+      .filter((i) => !q ||
+        (i.title + ' ' + i.location + ' ' + i.category + ' ' + i.description).toLowerCase().includes(q));
   }
 
-  function emptyFor(total) {
+  /* ---------------- Rendering ---------------- */
+
+  function noteFor(item) {
+    if (item.type === 'lost') {
+      return [
+        'Still searching. We will flag it here if a match is reported.',
+        'A possible match was reported. Open the details to check it.',
+        'Great news! You marked this item as recovered.',
+      ][STAGE[item.status] ?? 0];
+    }
+
+    if (item.status === 'CLAIMED') return 'Someone has claimed this item. Verify them at the campus office, then mark it returned.';
+    if (item.status === 'RESOLVED') return 'Returned to its owner. Thank you for helping!';
+    if (item.custody === 'AT_OFFICE') return 'This item is at the campus office, waiting for its owner.';
+    if (item.custody === 'WITH_FINDER') return 'You are holding this item. Hand it to the campus office when you can.';
+    return 'Waiting for its owner to claim it.';
+  }
+
+  function trackerHTML(item) {
+    const stage = STAGE[item.status] ?? 0;
+
+    return '<ol class="mi-track" aria-label="Status progress">' +
+      LABELS[item.type].steps.map((label, i) => {
+        const cls = (i < stage || stage === 2) ? 'done' : (i === stage ? 'current' : '');
+        return `<li class="${cls}"${cls === 'current' ? ' aria-current="step"' : ''}>${label}</li>`;
+      }).join('') +
+      '</ol>';
+  }
+
+  function actionsHTML(item) {
+    const id = escapeHTML(item.id);
+    const buttons = [
+      `<a class="btn btn-outline" href="item-details.html?id=${encodeURIComponent(item.id)}">View</a>`,
+    ];
+
+    if (item.status !== 'RESOLVED') {
+      if (item.type === 'found' && item.custody === 'WITH_FINDER') {
+        buttons.push(`<button type="button" class="btn btn-outline" data-action="office" data-id="${id}">Handed to office</button>`);
+      }
+      buttons.push(`<button type="button" class="btn btn-primary" data-action="resolve" data-id="${id}">${LABELS[item.type].resolve}</button>`);
+    }
+
+    buttons.push(`<button type="button" class="btn btn-ghost mi-danger" data-action="delete" data-id="${id}">Delete</button>`);
+    return buttons.join('');
+  }
+
+  function cardHTML(item) {
+    const stage = STAGE[item.status] ?? 0;
+    const labels = LABELS[item.type];
+    const url = 'item-details.html?id=' + encodeURIComponent(item.id);
+
+    return `
+      <article class="mi-card">
+        <a class="mi-media" href="${url}" aria-label="View ${escapeHTML(item.title)}">
+          <img src="${item.image}" alt="${escapeHTML(item.title)}" loading="lazy">
+          <div class="mi-pills">
+            <span class="mi-pill mi-pill--${item.type}">${item.type === 'lost' ? 'Lost' : 'Found'}</span>
+            <span class="mi-pill ${PILL_CLASS[stage]}">${labels.pill[stage]}</span>
+          </div>
+        </a>
+        <div class="mi-body">
+          <h3 class="mi-title"><a href="${url}">${escapeHTML(item.title)}</a></h3>
+          ${item.description ? `<p class="mi-desc">${escapeHTML(item.description)}</p>` : ''}
+          <ul class="mi-meta">
+            <li><span aria-hidden="true">📍</span> ${escapeHTML(item.location)}</li>
+            <li><span aria-hidden="true">📅</span> ${formatDate(item.date)} · ${timeAgo(item.date)}</li>
+            ${item.category ? `<li><span aria-hidden="true">🏷️</span> ${escapeHTML(item.category)}</li>` : ''}
+          </ul>
+          ${trackerHTML(item)}
+          <p class="mi-note">${escapeHTML(noteFor(item))}</p>
+          <div class="mi-actions">${actionsHTML(item)}</div>
+        </div>
+      </article>`;
+  }
+
+  function stateHTML({ icon, title, text, actions }) {
+    return `
+      <div class="mi-state">
+        ${icon === 'spinner'
+          ? '<div class="mi-spinner" aria-hidden="true"></div>'
+          : `<div class="mi-state-icon" aria-hidden="true">${icon}</div>`}
+        <h3>${title}</h3>
+        ${text ? `<p>${text}</p>` : ''}
+        ${actions ? `<div class="mi-state-actions">${actions}</div>` : ''}
+      </div>`;
+  }
+
+  function emptyHTML() {
+    const total = state.items.filter((i) => i.type === state.tab).length;
     const isLost = state.tab === 'lost';
 
-    // The tab has no items at all
     if (total === 0) {
-      return buildEmptyState({
+      return stateHTML({
         icon: '📭',
-        title: 'No items',
+        title: isLost ? 'No lost items yet' : 'No found items yet',
         text: isLost
-          ? 'You have not reported anything lost yet. If you lose something, report it and we will help you track it down.'
-          : 'You have not reported anything found yet. Found something on campus? Report it so the owner can claim it.',
-        actionsHTML: isLost
-          ? '<a href="report.html" class="btn btn-primary">Report Lost Item</a>'
-          : '<a href="report.html" class="btn btn-primary">Report Found Item</a>',
+          ? 'You have not reported anything lost. If you lose something, report it and we will help you track it down.'
+          : 'You have not reported anything found. Found something on campus? Report it so the owner can claim it.',
+        actions: `<a href="report.html?type=${isLost ? 'LOST' : 'FOUND'}" class="btn btn-primary">${isLost ? 'Report a lost item' : 'Report a found item'}</a>`,
       });
     }
 
-    // Items exist, but the search found none
-    return buildEmptyState({
+    return stateHTML({
       icon: '🔎',
-      title: 'No items match your search',
-      text: 'Try a different keyword, or clear the search to see all your items.',
-      actionsHTML: '<button type="button" class="btn btn-outline" id="clear-search">Clear search</button>',
+      title: 'No items match',
+      text: 'Try a different search or status, or clear the filters.',
+      actions: '<button type="button" class="btn btn-outline" data-action="clear">Clear filters</button>',
     });
   }
 
   function render() {
-    const list = data[state.tab];
-    const q = state.q.trim().toLowerCase();
+    const lost = state.items.filter((i) => i.type === 'lost').length;
+    const found = state.items.filter((i) => i.type === 'found').length;
+    const resolved = state.items.filter((i) => i.status === 'RESOLVED').length;
 
-    const items = list
-      .filter((i) => !q || (i.title + ' ' + i.location + ' ' + i.category).toLowerCase().includes(q))
-      .sort((a, b) => new Date(b.date) - new Date(a.date));
+    document.getElementById('count-lost').textContent = lost;
+    document.getElementById('count-found').textContent = found;
+    document.getElementById('stat-lost').textContent = lost;
+    document.getElementById('stat-found').textContent = found;
+    document.getElementById('stat-resolved').textContent = resolved;
 
-    if (!items.length) {
-      grid.innerHTML = emptyFor(list.length);
-      const clear = document.getElementById('clear-search');
-      if (clear) clear.addEventListener('click', () => { search.value = ''; state.q = ''; render(); });
+    if (state.loading) {
+      grid.innerHTML = stateHTML({ icon: 'spinner', title: 'Loading your items' });
       return;
     }
 
-    grid.innerHTML = items.map((item) => buildItemCard(item, actionsFor(item))).join('');
+    if (state.error) {
+      grid.innerHTML = stateHTML({
+        icon: '⚠️',
+        title: 'Could not load your items',
+        text: escapeHTML(state.error),
+        actions: '<button type="button" class="btn btn-primary" data-action="retry">Try again</button>',
+      });
+      return;
+    }
+
+    const list = visibleItems();
+    grid.innerHTML = list.length ? list.map(cardHTML).join('') : emptyHTML();
   }
 
-  /* ---------------- Events ---------------- */
-  tabs.forEach((tab) => tab.addEventListener('click', () => {
-    state.tab = tab.dataset.tab;
+  /* ---------------- Actions ---------------- */
+
+  let toastTimer;
+
+  function toast(message, type) {
+    let el = document.getElementById('mi-toast');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'mi-toast';
+      el.setAttribute('role', 'status');
+      document.body.appendChild(el);
+    }
+    el.textContent = message;
+    el.className = 'mi-toast visible' + (type === 'error' ? ' error' : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('visible'), 3500);
+  }
+
+  async function patchItem(id, data, message, btn) {
+    btn.disabled = true;
+    try {
+      const rec = await pb.collection('items').update(id, data, { expand: 'category' });
+      const index = state.items.findIndex((i) => i.id === id);
+      if (index !== -1) state.items[index] = mapItem(rec);
+      render();
+      toast(message);
+    } catch (err) {
+      console.error(err);
+      toast(pbErrorMessage(err), 'error');
+      btn.disabled = false;
+    }
+  }
+
+  async function removeItem(id, btn) {
+    if (!confirm('Delete this report? This cannot be undone.')) return;
+
+    btn.disabled = true;
+    try {
+      await pb.collection('items').delete(id);
+      state.items = state.items.filter((i) => i.id !== id);
+      render();
+      toast('Report deleted.');
+    } catch (err) {
+      console.error(err);
+      toast(pbErrorMessage(err), 'error');
+      btn.disabled = false;
+    }
+  }
+
+  function setTab(tab) {
+    state.tab = tab;
     tabs.forEach((t) => {
-      const active = t === tab;
+      const active = t.dataset.tab === tab;
       t.classList.toggle('active', active);
       t.setAttribute('aria-selected', active);
     });
     render();
-  }));
+  }
 
-  search.addEventListener('input', () => { state.q = search.value; render(); });
+  /* ---------------- Events ---------------- */
 
-  // "Mark as recovered / returned" buttons (dummy: only updates this page)
+  tabs.forEach((tab) => tab.addEventListener('click', () => setTab(tab.dataset.tab)));
+
+  searchInput.addEventListener('input', () => { state.q = searchInput.value; render(); });
+  statusSelect.addEventListener('change', () => { state.status = statusSelect.value; render(); });
+
   grid.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-resolve]');
+    const btn = e.target.closest('[data-action]');
     if (!btn) return;
-    const item = data[state.tab].find((i) => String(i.id) === btn.dataset.resolve);
-    if (item) {
-      item.status = 'returned';
-      render();
+
+    const id = btn.dataset.id;
+    switch (btn.dataset.action) {
+      case 'resolve':
+        patchItem(id, { status: 'RESOLVED' }, 'Marked as resolved.', btn);
+        break;
+      case 'office':
+        patchItem(id, { custody: 'AT_OFFICE' }, 'Updated: item is at the campus office.', btn);
+        break;
+      case 'delete':
+        removeItem(id, btn);
+        break;
+      case 'retry':
+        loadItems();
+        break;
+      case 'clear':
+        state.q = '';
+        state.status = 'all';
+        searchInput.value = '';
+        statusSelect.value = 'all';
+        render();
+        break;
     }
   });
 
   /* ---------------- Init ---------------- */
-  updateCounts();
-  render();
+
+  renderProfile();
+  setTab(new URLSearchParams(window.location.search).get('tab') === 'found' ? 'found' : 'lost');
+  loadItems();
 })();

@@ -7,15 +7,13 @@
    ========================================================= */
 
 :root {
-  --text: #1f2937;
-  --muted: #6b7280;
-  --border: #e5e7eb;
-  --primary: #4f46e5;
-  --primary-dark: #4338ca;
+  --text: var(--dark-text);
+  --primary: var(--green);
+  --primary-dark: var(--deep-green);
   --lost: #f97316;
-  --found: #16a34a;
+  --found: var(--green);
   --danger: #dc2626;
-  --success: #16a34a;
+  --success: var(--green);
   --radius: 18px;
 }
 
@@ -32,7 +30,7 @@ body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   color: var(--text);
   line-height: 1.5;
-  background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 50%, #ecfeff 100%);
+  background: linear-gradient(135deg, #eaf2ee 0%, var(--ivory) 55%, #e4eee9 100%);
 }
 
 /* ---------- Header ---------- */
@@ -96,10 +94,22 @@ body {
   padding: 36px 30px;
   border-radius: var(--radius);
   color: #fff;
-  background: linear-gradient(160deg, #4f46e5 0%, #7c3aed 60%, #db2777 120%);
-  box-shadow: 0 20px 40px -20px rgba(79, 70, 229, 0.6);
+  background: linear-gradient(160deg, var(--deep-green) 0%, var(--green) 65%, #3b8a62 125%);
+  box-shadow: 0 20px 40px -20px rgba(23, 63, 53, 0.65);
 }
-.report-intro::after {                    /* soft decorative circle */
+
+.report-intro::before {                   /* faint circle, top left */
+  content: "";
+  position: absolute;
+  top: -60px;
+  left: -60px;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.report-intro::after {                    /* soft circle, bottom right */
   content: "";
   position: absolute;
   right: -70px;
@@ -114,6 +124,7 @@ body {
 
 .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
 .steps li { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+
 .steps li span {
   flex: 0 0 auto;
   width: 28px;
@@ -121,7 +132,8 @@ body {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--gold);
+  color: var(--deep-green);
   font-size: 0.9rem;
   font-weight: 700;
 }
@@ -152,10 +164,11 @@ body {
   padding: 28px 30px 12px;
   counter-reset: section;
   scrollbar-width: thin;
-  scrollbar-color: #c7c9d9 transparent;
+    scrollbar-color: #c5d4cc transparent;
 }
+
 .form-scroll::-webkit-scrollbar { width: 8px; }
-.form-scroll::-webkit-scrollbar-thumb { background: #c7c9d9; border-radius: 8px; }
+.form-scroll::-webkit-scrollbar-thumb { background: #c5d4cc; border-radius: 8px; }
 
 .form-section { margin-bottom: 26px; }
 .form-section h2 {
@@ -174,7 +187,7 @@ body {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #eef2ff;
+  background: var(--light-green);
   color: var(--primary);
   font-size: 0.85rem;
   font-weight: 700;
@@ -229,7 +242,7 @@ input:focus, select:focus, textarea:focus {
   outline: none;
   background: #fff;
   border-color: var(--primary);
-  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.14);
+  box-shadow: 0 0 0 4px rgba(39, 103, 73, 0.15);
 }
 textarea { resize: vertical; }
 
@@ -268,7 +281,7 @@ textarea { resize: vertical; }
   transition: border-color 0.15s, background 0.15s, transform 0.15s;
 }
 .radio-card:hover { border-color: var(--primary); transform: translateY(-1px); }
-.radio-card:has(input:checked) { border-color: var(--primary); background: #eef2ff; }
+.radio-card:has(input:checked) { border-color: var(--primary); background: var(--light-green); }
 .radio-card input { accent-color: var(--primary); }
 
 /* The big Lost / Found switch at the top */
@@ -297,7 +310,7 @@ textarea { resize: vertical; }
   background: #f0fdf4;
   color: #15803d;
 }
-.type-switch .radio-card:has(input:focus-visible) { outline: 3px solid rgba(79, 70, 229, 0.4); }
+.type-switch .radio-card:has(input:focus-visible) { outline: 3px solid rgba(39, 103, 73, 0.4); }
 
 /* ---------- Photo preview with small cross ---------- */
 
@@ -330,28 +343,27 @@ textarea { resize: vertical; }
 }
 .photo-remove:hover { background: #991b1b; }
 
-/* ---------- Buttons ---------- */
+/* ---------- Form buttons (colours come from global.css) ---------- */
 
-.btn {
+.form-actions .btn {
   padding: 12px 24px;
-  font: inherit;
   font-weight: 700;
-  border: 1.5px solid transparent;
   border-radius: 12px;
-  cursor: pointer;
-  transition: transform 0.12s, box-shadow 0.12s, background 0.12s;
 }
-.btn:active { transform: scale(0.98); }
-.btn-primary {
+
+.form-actions .btn-primary {
   flex: 1;
-  color: #fff;
-  background: linear-gradient(135deg, #4f46e5, #7c3aed);
-  box-shadow: 0 8px 18px -8px rgba(79, 70, 229, 0.7);
 }
-.btn-primary:hover { box-shadow: 0 10px 22px -8px rgba(79, 70, 229, 0.9); }
-.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
-.btn-ghost { color: var(--text); background: transparent; border-color: var(--border); }
-.btn-ghost:hover { background: #f3f4f6; }
+
+.form-actions .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-actions .btn-ghost {
+  color: var(--dark-text);
+  border-color: var(--border);
+}
 
 /* ---------- Messages ---------- */
 
@@ -421,5 +433,4 @@ textarea { resize: vertical; }
   .field-row,
   .radio-group { grid-template-columns: 1fr; }
   .type-switch { grid-template-columns: 1fr 1fr; }   /* keep the lost/found switch side by side */
-  .site-header nav { gap: 12px; font-size: 0.9rem; }
 }
