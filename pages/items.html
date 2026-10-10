@@ -5,10 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Browse Items | FindIt</title>
   <link rel="stylesheet" href="../css/global.css">
-  <link rel="stylesheet" href="../css/components.css">
   <link rel="stylesheet" href="../css/items.css">
 </head>
-<body>
+<body data-nav="items">
   <header class="navbar">
     <nav class="nav-inner">
       <a href="../index.html" class="nav-logo">
@@ -17,9 +16,8 @@
       <div class="nav-menu">
         <ul class="nav-links">
           <li><a href="../index.html">Home</a></li>
-          <li><a href="items.html" class="active">Browse Items</a></li>
-          <li><a href="report.html">Report Lost</a></li>
-          <li><a href="report.html">Report Found</a></li>
+          <li><a href="items.html">Browse Items</a></li>
+          <li><a href="report.html">Report</a></li>
           <li data-auth="in" hidden><a href="my-items.html">My Items</a></li>
         </ul>
         <div class="nav-actions">
@@ -31,79 +29,35 @@
     </nav>
   </header>
 
-  <!-- ===== Banner: title left, search + filter right ===== -->
-  <section class="browse-hero">
-    <div class="hero-inner">
-      <div class="hero-title">
+  <main class="br-layout">
+
+    <!-- Banner -->
+    <section class="br-banner" aria-label="Search items">
+      <div class="br-banner-text">
         <h1>Browse Items</h1>
         <p>Search everything reported lost or found on campus.</p>
       </div>
 
-      <div class="hero-tools">
-        <div class="hero-search">
-          <input type="search" id="search" placeholder="Search items, locations or categories" aria-label="Search items">
+      <div class="br-banner-tools">
+        <div class="br-search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input type="search" id="search" placeholder="Search items, locations or categories" aria-label="Search items">
         </div>
-        <button type="button" class="filter-btn" id="filters-toggle" aria-expanded="false" aria-controls="filters">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h18l-7 8.5V19l-4 2v-8.5L3 4z"/></svg>
-          Filter
-        </button>
+        <a href="report.html" class="btn br-btn-light">Report an item</a>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <main class="container browse-main">
+    <!-- Main card -->
+    <section class="br-main">
 
-    <!-- Tabs (type) on the left, sort + view toggle on the right -->
-    <div class="browse-bar">
-      <div class="tabs" id="type-tabs" role="tablist" aria-label="Item type">
-        <button type="button" class="tab active" role="tab" data-type="all">All <span class="tab-count" id="count-all">0</span></button>
-        <button type="button" class="tab" role="tab" data-type="lost">Lost <span class="tab-count" id="count-lost">0</span></button>
-        <button type="button" class="tab" role="tab" data-type="found">Found <span class="tab-count" id="count-found">0</span></button>
+      <div class="br-tabs" id="type-tabs" role="tablist" aria-label="Item type">
+        <button type="button" class="br-tab active" role="tab" aria-selected="true" data-type="all">All <span class="br-count" id="count-all">0</span></button>
+        <button type="button" class="br-tab" role="tab" aria-selected="false" data-type="lost">Lost <span class="br-count" id="count-lost">0</span></button>
+        <button type="button" class="br-tab" role="tab" aria-selected="false" data-type="found">Found <span class="br-count" id="count-found">0</span></button>
       </div>
 
-      <div class="results-tools">
-        <label for="filter-sort">Sort by:</label>
-        <select id="filter-sort" class="sort-select">
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
-        </select>
-
-        <div class="view-toggle" role="group" aria-label="View">
-          <button type="button" class="active" data-view="grid" aria-pressed="true" aria-label="Grid view">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-          </button>
-          <button type="button" data-view="list" aria-pressed="false" aria-label="List view">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Filter panel (opens with the Filter button) -->
-    <div class="filters" id="filters">
-      <div class="filter">
-        <label for="filter-status">Status</label>
-        <select id="filter-status">
-          <option value="all">All statuses</option>
-          <option value="open">Open (missing / unclaimed)</option>
-          <option value="office">At campus office</option>
-          <option value="pending">Claim / match pending</option>
-          <option value="returned">Returned / recovered</option>
-        </select>
-      </div>
-      <div class="filter">
-        <label for="filter-date">Date</label>
-        <select id="filter-date">
-          <option value="all">Any time</option>
-          <option value="today">Today</option>
-          <option value="7">Last 7 days</option>
-          <option value="30">Last 30 days</option>
-        </select>
-      </div>
-      <div class="filter">
-        <label for="filter-category">Category</label>
-        <select id="filter-category">
+      <div class="br-toolbar">
+        <select id="filter-category" aria-label="Filter by category">
           <option value="all">All categories</option>
           <option>Electronics</option>
           <option>Bags</option>
@@ -112,19 +66,50 @@
           <option>Accessories</option>
           <option>Other</option>
         </select>
+        <select id="filter-status" aria-label="Filter by status">
+          <option value="all">All statuses</option>
+          <option value="open">Open (missing / unclaimed)</option>
+          <option value="office">At campus office</option>
+          <option value="pending">Claim / match pending</option>
+          <option value="returned">Returned / recovered</option>
+        </select>
+        <select id="filter-date" aria-label="Filter by date">
+          <option value="all">Any time</option>
+          <option value="today">Today</option>
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+        </select>
+        <button type="button" class="btn btn-ghost br-clear" id="clear-filters" hidden>Clear filters</button>
       </div>
-      <button type="button" class="btn btn-ghost filter-clear" id="clear-filters">Clear filters</button>
-    </div>
 
-    <!-- Result count -->
-    <div class="results-bar">
-      <span class="result-count" id="result-count" aria-live="polite"></span>
-    </div>
+      <div class="br-results">
+        <span class="br-result-count" id="result-count" aria-live="polite"></span>
 
-    <div class="item-grid" id="items-grid"></div>
+        <div class="br-results-tools">
+          <label for="filter-sort">Sort by</label>
+          <select id="filter-sort" class="br-sort">
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+          </select>
+
+          <div class="br-view" role="group" aria-label="View">
+            <button type="button" class="active" data-view="grid" aria-pressed="true" aria-label="Grid view">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+            </button>
+            <button type="button" data-view="list" aria-pressed="false" aria-label="List view">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="br-grid" id="items-grid" aria-live="polite"></div>
+    </section>
 
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/pocketbase/dist/pocketbase.umd.js"></script>
+  <script src="../js/pb.js"></script>
   <script src="../js/app.js"></script>
   <script src="../js/items.js"></script>
 </body>

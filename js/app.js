@@ -1,38 +1,71 @@
-const AUTH_KEY = 'findit_user';
+// Load the profile dialog (icon, edit photo, change password, logout confirm) on every page
+(function () {
+  const src = document.currentScript && document.currentScript.src;
+  if (!src) return;
+  const root = src.replace(/js\/app\.js.*$/, '');
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = root + 'css/profile.css';
+  document.head.appendChild(link);
+  const script = document.createElement('script');
+  script.src = root + 'js/profile.js';
+  document.body.appendChild(script);
+})();
 
 function getCurrentUser() {
-  try {
-    return JSON.parse(localStorage.getItem(AUTH_KEY));
-  } catch {
-    return null;
-  }
+  return pb.authStore.record || pb.authStore.model || null; 
 }
 
 function isLoggedIn() {
-  return getCurrentUser() !== null;
+  return pb.authStore.isValid;
 }
 
 function logout() {
-  localStorage.removeItem(AUTH_KEY);
-  window.location.reload();
+  pb.authStore.clear();
+  window.location.href = location.pathname.includes('/pages/') ? '../index.html' : 'index.html';
 }
 
-(function demoSwitch() {
-  const demo = new URLSearchParams(window.location.search).get('demo');
-  if (demo === 'login') {
-    localStorage.setItem(
-      AUTH_KEY,
-      JSON.stringify({ id: 1, name: 'Demo Student', email: 'demo@university.edu' })
-    );
+function requireAuth() {
+  if (!isLoggedIn()) {
+    sessionStorage.setItem('findit_next', window.location.href);
+    window.location.href = location.pathname.includes('/pages/') ? 'login.html' : 'pages/login.html';
   }
-  if (demo === 'logout') localStorage.removeItem(AUTH_KEY);
-})();
+}
 
 function applyAuthState() {
   const loggedIn = isLoggedIn();
   document.querySelectorAll('[data-auth="in"]').forEach((el) => { el.hidden = !loggedIn; });
   document.querySelectorAll('[data-auth="out"]').forEach((el) => { el.hidden = loggedIn; });
-  document.querySelectorAll('[data-logout]').forEach((el) => el.addEventListener('click', logout));
+}
+
+function highlightActiveLink() {
+  const clean = (path) => path.replace(/\/index\.html$/, '/').replace(/\.html$/, '');
+  const section = document.body.dataset.nav;
+  const current = clean(location.pathname);
+
+  document.querySelectorAll('.nav-links a').forEach((link) => {
+    const target = clean(new URL(link.getAttribute('href'), location.href).pathname);
+    const isActive = section
+      ? target.endsWith('/' + section)
+      : target === current;
+
+    link.classList.toggle('active', isActive);
+    if (isActive) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  });
+}
+
+highlightActiveLink();
+
+document.querySelectorAll('[data-logout]').forEach((el) => el.addEventListener('click', logout));
+pb.authStore.onChange(applyAuthState);   // keeps the navbar in sync
+
+if (document.body.hasAttribute('data-protected')) requireAuth();
+
+if (isLoggedIn()) {
+  pb.collection('users').authRefresh().catch((err) => {
+    if ([400, 401, 403, 404].includes(err.status)) pb.authStore.clear();
+  });
 }
 
 applyAuthState();
@@ -155,4 +188,27 @@ function buildEmptyState({ icon, title, text, actionsHTML }) {
       <p>${text}</p>
       ${actionsHTML ? `<div class="empty-actions">${actionsHTML}</div>` : ''}
     </div>`;
+}
+
+/* ---------- Auth helpers (used by login.js / signup.js / report) ---------- */
+function showFormMessage(text, type) {
+  const box = document.getElementById('form-message');
+  if (!box) return;
+  box.textContent = text;
+  box.className = 'form-message ' + type;
+}
+
+function pbErrorMessage(err) {
+  if (err.status === 0) return 'Cannot reach the server. Is PocketBase running?';
+  const data = err.response && err.response.data;
+  if (data && Object.keys(data).length) {
+    return Object.values(data).map((v) => v.message).join(' ');
+  }
+  return (err.response && err.response.message) || 'Something went wrong. Please try again.';
+}
+
+function goAfterAuth() {
+  const next = sessionStorage.getItem('findit_next');
+  sessionStorage.removeItem('findit_next');
+  window.location.href = next || '../index.html';
 }

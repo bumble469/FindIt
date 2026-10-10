@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign Up | FindIt</title>
   <link rel="stylesheet" href="../css/global.css">
-  <link rel="stylesheet" href="../css/signup.css">
+  <link rel="stylesheet" href="../css/auth.css">
 </head>
 <body>
   <header class="navbar">
@@ -17,8 +17,7 @@
         <ul class="nav-links">
           <li><a href="../index.html">Home</a></li>
           <li><a href="items.html">Browse Items</a></li>
-          <li><a href="report.html">Report Lost</a></li>
-          <li><a href="report.html">Report Found</a></li>
+          <li><a href="report.html">Report</a></li>
           <li data-auth="in" hidden><a href="my-items.html">My Items</a></li>
         </ul>
         <div class="nav-actions">
@@ -32,40 +31,72 @@
 
   <main class="auth-wrapper">
     <div class="auth-card">
-      <h1>Create your account</h1>
-      <p class="subtitle">Join FindIt to report and find lost items on campus.</p>
+      <aside class="auth-side">
+        <p class="auth-kicker"><span class="auth-dot" aria-hidden="true"></span> University Lost &amp; Found</p>
+        <h1>Join FindIt</h1>
+        <p class="auth-lead">Create an account to report and find lost items on campus.</p>
+        <ul class="auth-points">
+          <li><span class="auth-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4 10-10"/></svg></span> Report lost or found items in minutes</li>
+          <li><span class="auth-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4 10-10"/></svg></span> Track all your reports in one place</li>
+          <li><span class="auth-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4 4 10-10"/></svg></span> Claim your belongings at the campus office</li>
+        </ul>
+      </aside>
 
-      <form id="signup-form">
-        <div id="form-message" class="form-message" role="alert"></div>
+      <section class="auth-form-side">
+        <h2>Create your account</h2>
+        <p class="auth-sub">It only takes a minute.</p>
 
-        <div class="form-group">
-          <label for="name">Full name</label>
-          <input type="text" id="name" name="name" placeholder="Your name" required autocomplete="name">
-        </div>
+        <form id="signup-form">
+          <div id="form-message" class="form-message" role="alert"></div>
 
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">
-        </div>
+          <div class="form-group">
+            <label for="name">Full name</label>
+            <input type="text" id="name" name="name" placeholder="Your name" required autocomplete="name" autofocus>
+            <p class="field-error" id="name-error" hidden></p>
+          </div>
 
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" placeholder="At least 8 characters" required autocomplete="new-password">
-        </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">
+            <p class="field-error" id="email-error" hidden></p>
+          </div>
 
-        <div class="form-group">
-          <label for="confirm">Confirm password</label>
-          <input type="password" id="confirm" name="confirm" placeholder="Repeat your password" required autocomplete="new-password">
-        </div>
+          <div class="field-row">
+            <div class="form-group">
+              <label for="password">Password</label>
+              <div class="pw-field">
+                <input type="password" id="password" name="password" placeholder="8+ characters" required autocomplete="new-password">
+                <button type="button" class="pw-toggle" data-toggle-password aria-label="Show password" aria-pressed="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <p class="field-error" id="password-error" hidden></p>
+            </div>
 
-        <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
-      </form>
+            <div class="form-group">
+              <label for="confirm">Confirm password</label>
+              <div class="pw-field">
+                <input type="password" id="confirm" name="confirm" placeholder="Repeat it" required autocomplete="new-password">
+                <button type="button" class="pw-toggle" data-toggle-password aria-label="Show password" aria-pressed="false">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+              </div>
+              <p class="field-error" id="confirm-error" hidden></p>
+            </div>
+          </div>
 
-      <p class="auth-footer">Already have an account? <a href="login.html">Log in</a></p>
+          <button type="submit" class="btn btn-primary auth-submit">Sign Up</button>
+        </form>
+
+        <p class="auth-footer">Already have an account? <a href="login.html">Log in</a></p>
+      </section>
+
     </div>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/pocketbase/dist/pocketbase.umd.js"></script>
+  <script src="../js/pb.js"></script>
   <script src="../js/app.js"></script>
-  <script src="../js/auth.js"></script>
+  <script src="../js/signup.js"></script>
 </body>
 </html>

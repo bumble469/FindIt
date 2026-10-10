@@ -19,8 +19,7 @@
         <ul class="nav-links">
           <li><a href="index.html" class="active">Home</a></li>
           <li><a href="pages/items.html">Browse Items</a></li>
-          <li><a href="pages/report.html">Report Lost</a></li>
-          <li><a href="pages/report.html">Report Found</a></li>
+          <li><a href="pages/report.html">Report</a></li>
           <li data-auth="in" hidden><a href="pages/my-items.html">My Items</a></li>
         </ul>
         <div class="nav-actions">
@@ -33,17 +32,17 @@
   </header>
 
   <main>
+
+    <!-- ===== Banner ===== -->
     <section class="home-hero">
       <div class="dashboard-hero">
         <div class="hero-content">
-          <p class="hero-badge"><span class="hero-badge-dot" aria-hidden="true"></span> University Lost &amp; Found
-            System</p>
-          <h2>Lost your valuable?</h2>
-          <p class="sub-text">Your central campus platform to report, track, and recover misplaced items quickly and
-            securely.</p>
+          <p class="hero-badge"><span class="hero-badge-dot" aria-hidden="true"></span> University Lost &amp; Found System</p>
+          <h1>Lost your <span>valuable?</span></h1>
+          <p class="sub-text">Your central campus platform to report, track, and recover misplaced items quickly and securely.</p>
           <div class="hero-actions">
-            <a href="pages/report.html" class="btn btn-hero-primary">Report Found Item</a>
-            <a href="pages/report.html" class="btn btn-hero-ghost">Report Lost Item</a>
+            <a href="pages/report.html?type=FOUND" class="btn btn-hero-primary">Report Found Item</a>
+            <a href="pages/report.html?type=LOST" class="btn btn-hero-ghost">Report Lost Item</a>
           </div>
         </div>
 
@@ -51,41 +50,214 @@
           <div class="recent-panel">
             <h3>Recently reported</h3>
             <div class="recent-items-wrapper">
-              <div class="recent-items-list" id="recent-items-list"></div>
+              <div class="recent-items-list" id="recent-items-list" aria-live="polite">
+                <p class="recent-empty">Loading…</p>
+              </div>
             </div>
+            <a href="pages/items.html" class="recent-more">Browse all items &rarr;</a>
           </div>
         </aside>
       </div>
     </section>
 
-    <section class="how-section" id="how-it-works">
-      <div class="how-inner">
-        <p class="how-kicker">Simple process</p>
-        <h2>How FindIt works</h2>
-        <p class="how-lead">Four steps from report to recovery — no chasing notice boards.</p>
+    <!-- ===== Live stats ===== -->
+    <section class="stats-section" aria-label="FindIt in numbers">
+      <div class="stats-card">
+        <div class="stat">
+          <strong id="stat-total">–</strong>
+          <span>Items reported</span>
+        </div>
+        <div class="stat">
+          <strong id="stat-resolved">–</strong>
+          <span>Returned to owners</span>
+        </div>
+        <div class="stat">
+          <strong id="stat-active">–</strong>
+          <span>Active reports</span>
+        </div>
+        <div class="stat">
+          <strong id="stat-rate">–</strong>
+          <span>Recovery rate</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== How it works ===== -->
+    <section class="section how-section" id="how-it-works">
+      <div class="section-inner">
+        <div class="section-head">
+          <p class="kicker">Simple process</p>
+          <h2>How FindIt works</h2>
+          <p class="lead">Four steps from report to recovery, with no chasing notice boards.</p>
+        </div>
 
         <ol class="how-flow">
           <li class="how-step">
-            <span class="how-num">01</span>
+            <span class="how-num" aria-hidden="true">01</span>
+            <span class="how-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </span>
             <h3>Report</h3>
-            <p>Post a lost or found item with location and a short description.</p>
+            <p>Post a lost or found item with its location and a short description.</p>
           </li>
           <li class="how-step">
-            <span class="how-num">02</span>
+            <span class="how-num" aria-hidden="true">02</span>
+            <span class="how-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            </span>
             <h3>Browse</h3>
             <p>Check recent reports and match items by type, place, or details.</p>
           </li>
           <li class="how-step">
-            <span class="how-num">03</span>
+            <span class="how-num" aria-hidden="true">03</span>
+            <span class="how-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+            </span>
             <h3>Verify</h3>
-            <p>Open the item page and confirm it with the campus office.</p>
+            <p>Open the item page, claim it, and confirm ownership with the campus office.</p>
           </li>
           <li class="how-step">
-            <span class="how-num">04</span>
+            <span class="how-num" aria-hidden="true">04</span>
+            <span class="how-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>
+            </span>
             <h3>Recover</h3>
             <p>Collect your belonging and mark the report as returned.</p>
           </li>
         </ol>
+      </div>
+    </section>
+
+    <!-- ===== What to do ===== -->
+    <section class="section guide-section">
+      <div class="section-inner">
+        <div class="section-head">
+          <p class="kicker">Quick guide</p>
+          <h2>What should I do?</h2>
+          <p class="lead">Whether you lost something or picked something up, here is the short version.</p>
+        </div>
+
+        <div class="guide-grid">
+          <article class="guide-card">
+            <span class="guide-pill guide-pill--lost">Lost something?</span>
+            <h3>Get it back</h3>
+            <ol class="guide-steps">
+              <li><span>1</span><p><strong>Search first.</strong> Browse items. Someone may have already handed it in.</p></li>
+              <li><span>2</span><p><strong>Report it.</strong> Add where and when you lost it, plus a clear description and photo if you have one.</p></li>
+              <li><span>3</span><p><strong>Track it.</strong> Watch My Items for a match, then verify at the campus office. Bring a photo ID.</p></li>
+            </ol>
+            <p class="guide-note">🔒 Unique identifying details you add are never shown publicly. Keep them for verification.</p>
+            <div class="guide-actions">
+              <a href="pages/items.html?type=found" class="btn btn-outline">Search found items</a>
+              <a href="pages/report.html?type=LOST" class="btn btn-primary">Report lost item</a>
+            </div>
+          </article>
+
+          <article class="guide-card">
+            <span class="guide-pill guide-pill--found">Found something?</span>
+            <h3>Return it</h3>
+            <ol class="guide-steps">
+              <li><span>1</span><p><strong>Report it.</strong> Say where you found it and add a photo so the owner can recognise it.</p></li>
+              <li><span>2</span><p><strong>Choose where it is.</strong> Keep it safe with you, or deposit it at the campus office.</p></li>
+              <li><span>3</span><p><strong>Hand it over.</strong> When a claim arrives, check it with the office, then mark the item as returned.</p></li>
+            </ol>
+            <p class="guide-note">📦 Can't reach the office today? Report it now and mark that you're holding it.</p>
+            <div class="guide-actions">
+              <a href="pages/items.html?type=lost" class="btn btn-outline">See lost items</a>
+              <a href="pages/report.html?type=FOUND" class="btn btn-primary">Report found item</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Campus office ===== -->
+    <section class="section office-section" id="office">
+      <div class="section-inner">
+        <div class="office-card">
+          <div class="office-text">
+            <p class="kicker kicker--light">Campus office</p>
+            <h2>Visit the lost &amp; found desk</h2>
+            <p>The office confirms every claim before anything is handed over. Bring a photo ID and be ready to describe the item.</p>
+            <a href="mailto:lostandfound@youruniversity.edu" class="btn br-btn-light">Email the office</a>
+          </div>
+
+          <ul class="office-info">
+            <li>
+              <span class="office-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11Z"/>
+                  <circle cx="12" cy="10" r="2.5"/>
+                </svg>
+              </span>
+              <div>
+                <strong>Location</strong>
+                <span>SPIT, Ground Floor, Lost &amp; Found Office</span>
+              </div>
+            </li>
+
+            <li>
+              <span class="office-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="9"/>
+                  <path d="M12 7v5l3 2"/>
+                </svg>
+              </span>
+              <div>
+                <strong>Opening hours</strong>
+                <span>Contact the campus administration for assistance</span>
+              </div>
+            </li>
+
+            <li>
+              <span class="office-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="5" width="18" height="14" rx="2"/>
+                  <path d="m3 7 9 6 9-6"/>
+                </svg>
+              </span>
+              <div>
+                <strong>Contact</strong>
+                <span>Visit the campus administration for lost and found assistance</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section class="section faq-section" id="faq">
+      <div class="section-inner faq-inner">
+        <div class="section-head">
+          <p class="kicker">Good to know</p>
+          <h2>Frequently asked questions</h2>
+        </div>
+
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>Do I need an account?</summary>
+            <p>Anyone can browse items. You need a free account to report an item, claim one, and follow your reports in My Items.</p>
+          </details>
+          <details class="faq-item">
+            <summary>How do I claim an item that is mine?</summary>
+            <p>Open the item from Browse Items and press Claim. The item moves to "Claim pending", and you confirm ownership at the campus office with a photo ID. Once it's handed over, the report is marked as returned.</p>
+          </details>
+          <details class="faq-item">
+            <summary>My item isn't listed. What now?</summary>
+            <p>Report it as lost with as much detail as you can. If someone later reports a match, the status in My Items changes to "Match found".</p>
+          </details>
+          <details class="faq-item">
+            <summary>I found something but can't get to the office today.</summary>
+            <p>Report it anyway and choose "I have it with me". When you've dropped it at the office, press "Handed to office" in My Items so owners know where to go.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Are my identifying details visible to everyone?</summary>
+            <p>No. The unique identifying details you add when reporting a lost item are not shown publicly. They stay available for verification.</p>
+          </details>
+          <details class="faq-item">
+            <summary>How long are items kept?</summary>
+            <p>Items are held at the SPIT Ground Floor Lost &amp; Found Office for 30 days. Please contact the office for details about unclaimed items.</p>        </div>
       </div>
     </section>
   </main>
@@ -93,21 +265,45 @@
   <footer class="site-footer">
     <div class="footer-inner">
       <div class="footer-brand">
-        <a href="index.html" class="nav-logo">FindIt</a>
+        <a href="index.html" class="footer-logo">FindIt</a>
         <p>Campus lost and found made simple, secure, and accessible for students and staff.</p>
       </div>
 
-      <div class="footer-info">
-        <span>University Lost &amp; Found System</span>
-        <span>Report &bull; Track &bull; Recover</span>
+      <nav class="footer-col" aria-label="Explore">
+        <h4>Explore</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="pages/items.html">Browse Items</a></li>
+          <li><a href="pages/report.html">Report an item</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </nav>
+
+      <nav class="footer-col" aria-label="Account">
+        <h4>Account</h4>
+        <ul class="footer-links">
+          <li data-auth="out"><a href="pages/login.html">Login</a></li>
+          <li data-auth="out"><a href="pages/signup.html">Sign Up</a></li>
+          <li data-auth="in" hidden><a href="pages/my-items.html">My Items</a></li>
+        </ul>
+      </nav>
+
+      <div class="footer-col">
+        <h4>Campus office</h4>
+        <ul class="footer-links footer-contact">
+          <li>SPIT, Ground Floor, Lost &amp; Found Office</li>
+          <li>Contact campus administration for assistance</li>
+          <li>Lost &amp; Found — FindIt Campus Portal</li>
+        </ul>
       </div>
 
-      <p class="footer-copy">&copy; 2026 FindIt. All rights reserved.</p>
+      <p class="footer-copy">&copy; 2026 FindIt. All rights reserved. &nbsp;·&nbsp; Report &bull; Track &bull; Recover</p>
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/pocketbase/dist/pocketbase.umd.js"></script>
+  <script src="js/pb.js"></script>
   <script src="js/app.js"></script>
   <script src="js/dashboard.js"></script>
 </body>
-
 </html>
