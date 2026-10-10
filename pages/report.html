@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Items | FindIt</title>
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/report.css">
+</head>
+<body>
+  <header class="navbar">
+    <nav class="nav-inner">
+      <a href="../index.html" class="nav-logo">
+        <img src="../assets/images/FindIt_logo.png" alt="FindIt logo">
+      </a>
+      <div class="nav-menu">
+        <ul class="nav-links">
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="items.html">Browse Items</a></li>
+          <li><a href="report.html">Report Lost</a></li>
+          <li><a href="report.html">Report Found</a></li>
+          <li data-auth="in" hidden><a href="my-items.html" class="active">My Items</a></li>
+        </ul>
+        <div class="nav-actions">
+          <a href="login.html" class="btn btn-outline" data-auth="out">Login</a>
+          <a href="signup.html" class="btn btn-primary" data-auth="out">Sign Up</a>
+          <button type="button" class="btn btn-outline" data-auth="in" data-logout hidden>Logout</button>
+        </div>
+      </div>
+    </nav>
+  </header>    
+
+
+  <main class="report-layout">
+ 
+    <!-- Left panel: title and short guide -->
+    <aside class="report-intro">
+      <h1>Report an item</h1>
+      <p>Lost something or found something? Share the details and help it find its way home.</p>
+      <ol class="steps">
+        <li><span>1</span> Choose lost or found</li>
+        <li><span>2</span> Describe the item and where it was</li>
+        <li><span>3</span> Submit, and others can see your report</li>
+      </ol>
+    </aside>
+ 
+    <!-- Right panel: the form card. Only .form-scroll scrolls. -->
+    <section class="report-card">
+      <form id="form-report" class="report-form" novalidate>
+ 
+        <div class="form-scroll">
+ 
+          <section class="form-section">
+            <h2>What are you reporting?</h2>
+            <div class="radio-group type-switch">
+              <label class="radio-card">
+                <input type="radio" name="type" value="LOST" checked />
+                <span class="emoji">🔍</span>
+                <span>I lost something</span>
+              </label>
+              <label class="radio-card">
+                <input type="radio" name="type" value="FOUND" />
+                <span class="emoji">📦</span>
+                <span>I found something</span>
+              </label>
+            </div>
+          </section>
+ 
+          <section class="form-section">
+            <h2>Item details</h2>
+ 
+            <div class="field">
+              <label for="item-name">Item name <span class="req">*</span></label>
+              <input type="text" id="item-name" maxlength="80" placeholder="e.g. Black wallet" />
+            </div>
+ 
+            <div class="field">
+              <label for="item-category">Category <span class="req">*</span></label>
+              <select id="item-category">
+                <option value="">— Select —</option>
+              </select>
+            </div>
+ 
+            <div class="field">
+              <label for="item-description">Description <span class="req">*</span></label>
+              <textarea id="item-description" rows="4" maxlength="500"
+                        placeholder="Colour, brand, size, anything that helps"></textarea>
+            </div>
+ 
+            <div class="field-row">
+              <div class="field">
+                <label for="item-date">Date <span class="req">*</span></label>
+                <input type="date" id="item-date" />
+              </div>
+              <div class="field">
+                <label for="item-time">Approximate time (optional)</label>
+                <input type="time" id="item-time" />
+              </div>
+            </div>
+ 
+            <div class="field">
+              <label for="item-location">Location <span class="req">*</span></label>
+              <input type="text" id="item-location" maxlength="120"
+                     placeholder="e.g. Central Library, 1st floor" />
+            </div>
+ 
+            <div class="field">
+              <label for="item-photo">Photo (one)</label>
+              <input type="file" id="item-photo" accept="image/*" />
+              <div id="photo-preview" class="preview-grid"></div>
+            </div>
+ 
+            <!-- Shown only when "I lost something" is selected -->
+            <div class="field" data-only="LOST">
+              <label for="item-identifying">Unique identifying details</label>
+              <textarea id="item-identifying" rows="3" maxlength="400"
+                        placeholder="Scratches, stickers, markings, serial number..."></textarea>
+              <div class="hint">🔒 This will NOT be shown publicly.</div>
+            </div>
+ 
+            <!-- Shown only when "I found something" is selected -->
+            <div class="field" data-only="FOUND">
+              <p>Where is the item now? <span class="req">*</span></p>
+              <div class="radio-group">
+                <label class="radio-card">
+                  <input type="radio" name="custody" value="WITH_FINDER" />
+                  <span>I have it with me</span>
+                </label>
+                <label class="radio-card">
+                  <input type="radio" name="custody" value="AT_OFFICE" />
+                  <span>Deposited at the campus office</span>
+                </label>
+              </div>
+            </div>
+          </section>
+ 
+        </div><!-- /form-scroll -->
+ 
+        <!-- Always visible at the bottom of the card -->
+        <div class="form-footer">
+          <div id="form-status" class="form-status" role="alert" hidden></div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit report</button>
+            <button type="reset" class="btn btn-ghost">Reset</button>
+          </div>
+        </div>
+ 
+      </form>
+    </section>
+  </main>
+ 
+  <!-- PocketBase SDK must come BEFORE forms.js -->
+  <script src="https://unpkg.com/pocketbase@0.26.8/dist/pocketbase.umd.js"></script>
+  <script src="../js/forms.js"></script>
+ 
+  <!-- Safety check: tells you on the page if forms.js did not load -->
+  <script>
+    if (typeof setupForm === "undefined") {
+      var box = document.getElementById("form-status");
+      box.textContent = "forms.js did not load. Check that it is in the js folder and the path in this page is correct.";
+      box.className = "form-status error";
+      box.hidden = false;
+    }
+  </script>
+</body>
+</html>
