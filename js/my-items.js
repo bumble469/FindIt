@@ -74,8 +74,8 @@
           ? 'You have not reported anything lost yet. If you lose something, report it and we will help you track it down.'
           : 'You have not reported anything found yet. Found something on campus? Report it so the owner can claim it.',
         actionsHTML: isLost
-          ? '<a href="report-lost.html" class="btn btn-primary">Report Lost Item</a>'
-          : '<a href="report-found.html" class="btn btn-primary">Report Found Item</a>',
+          ? '<a href="report.html" class="btn btn-primary">Report Lost Item</a>'
+          : '<a href="report.html" class="btn btn-primary">Report Found Item</a>',
       });
     }
 

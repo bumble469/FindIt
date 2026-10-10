@@ -324,7 +324,7 @@
 
     return (
       `<a class="btn btn-outline btn-sm" ` +
-      `href="report-found.html?match=${encodeURIComponent(item.id)}">` +
+      `href="report.html?match=${encodeURIComponent(item.id)}">` +
       `I found this` +
       `</a>` +
       details
@@ -383,7 +383,7 @@
           'Clear filters' +
           '</button>' +
 
-          '<a href="report-lost.html" class="btn btn-primary">' +
+          '<a href="report.html" class="btn btn-primary">' +
           'Report Lost Item' +
           '</a>',
       });
