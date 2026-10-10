@@ -10,8 +10,8 @@
 
   const POCKETBASE_URL = 'http://127.0.0.1:8090';
 
-  const ADMIN_EMAIL = 'admin@findit.local';
-  const ADMIN_PASSWORD = 'Admin123';
+  const ADMIN_EMAIL = 'findit@admin.com';
+  const ADMIN_PASSWORD = 'Admin@123';
 
   const AUTH_API =
     `${POCKETBASE_URL}/api/collections/_superusers/auth-with-password`;
