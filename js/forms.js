@@ -3,6 +3,7 @@
 const CUSTODY_FIELD = "custody";   // exact name of the custody field in PocketBase
 const PB_URL = pb.baseURL;         // pb comes from pb.js
 let categoriesFromDb = false;      // true once categories load from PocketBase
+let matchItem = null;              // the lost item being matched via "I found this"
 
 
 /* ---------- Messages ---------- */
@@ -214,7 +215,13 @@ async function handleSubmit(form) {
 
   try {
     const record = await pb.collection("items").create(body);
-    notify("Report submitted! Saved for " + when.toLocaleString() + " (ID: " + record.id + ")");
+    let note = "";
+    if (matchItem && type === "FOUND") note = await updateMatchedItem(record);
+    notify("Report submitted! Saved for " + when.toLocaleString() + " (ID: " + record.id + ")." + note);
+    if (matchItem) {
+      matchItem = null;
+      setTimeout(function () { window.location.href = "items.html"; }, 3000);
+    }
     form.reset();
     clearPhoto();
     updateFormForType();
@@ -265,6 +272,89 @@ function setupForm() {
 }
 
 
+/* ---------- Block "I found this" on your own lost item ---------- */
+
+async function checkMatch() {
+  const matchId = new URLSearchParams(window.location.search).get("match");
+  if (!matchId || !isLoggedIn()) return;
+  try {
+    const rec = await pb.collection("items").getOne(matchId);
+    if (rec.reported_by === getCurrentUser().id) {
+      notify("You can't report your own lost item as found.", "error");
+      document.querySelector('#form-report button[type="submit"]').disabled = true;
+      setTimeout(function () { window.location.href = "items.html"; }, 2500);
+    }
+  } catch (err) { /* form still works */ }
+}
+
+
+/* ---------- "I found this": prefill from the lost item + update its record ---------- */
+
+async function prefillFromMatch() {
+  const matchId = new URLSearchParams(window.location.search).get("match");
+  if (!matchId || !isLoggedIn()) return;
+
+  try {
+    const rec = await pb.collection("items").getOne(matchId);
+    const me = getCurrentUser();
+
+    if (rec.type !== "LOST") {
+      notify("That report is not a lost item, so it can't be matched.", "error");
+      return;
+    }
+    if (rec.reported_by === me.id) {
+      notify("You can't report your own lost item as found.", "error");
+      document.querySelector('#form-report button[type="submit"]').disabled = true;
+      setTimeout(function () { window.location.href = "items.html"; }, 2500);
+      return;
+    }
+    if (rec.status === "RESOLVED") {
+      notify("This lost item has already been recovered.", "error");
+      return;
+    }
+
+    matchItem = rec;
+
+    document.querySelector('input[name="type"][value="FOUND"]').checked = true;
+    updateFormForType();
+
+    document.getElementById("item-name").value = rec.item_name || "";
+    document.getElementById("item-description").value = rec.description || "";
+    if (categoriesFromDb && rec.category) {
+      document.getElementById("item-category").value = rec.category;
+    }
+
+    notify("Details filled in from the lost report \"" + (rec.item_name || "item") + "\". Check them, then add where and when you found it.", "success");
+  } catch (err) {
+    console.error("Could not load the lost item to match:", err);
+    notify("Could not load the lost item details. You can still fill the form in yourself.", "error");
+  }
+}
+
+// After the FOUND report is saved: confirm it exists, mark the lost item as matched, then re-read it to verify
+async function updateMatchedItem(found) {
+  const me = getCurrentUser();
+
+  try {
+    const saved = await pb.collection("items").getOne(found.id);
+    if (saved.type !== "FOUND" || saved.reported_by !== me.id) {
+      return " Warning: the new found report could not be verified.";
+    }
+
+    await pb.collection("items").update(matchItem.id, { status: "CLAIMED", claimed_by: me.id });
+
+    const check = await pb.collection("items").getOne(matchItem.id);
+    if (check.status === "CLAIMED" && check.claimed_by === me.id) {
+      return " The lost item is now marked as 'Match found'.";
+    }
+    return " Warning: the lost item was not updated (its status is still " + check.status + ").";
+  } catch (err) {
+    console.error("Could not update the matched lost item:", err);
+    const reason = (err.response && err.response.message) || err.message;
+    return " The report was saved, but the lost item could not be updated: " + reason;
+  }
+}
+
 /* ---------- Start ---------- */
 
 document.addEventListener("DOMContentLoaded", async function () {
@@ -283,6 +373,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     notify("Cannot reach PocketBase at " + PB_URL + ". Is it running?", "error");
     return;
   }
-
-  loadCategories();
+  await loadCategories();
+  await prefillFromMatch();
+  checkMatch();
 });

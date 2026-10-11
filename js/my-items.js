@@ -1,4 +1,4 @@
-// my-items.js – My Items page: profile + the user's lost and found reports (PocketBase)
+// my-items.js – My Items: profile + items I reported (lost / found) + found items I claimed (PocketBase)
 
 (function () {
   const grid = document.getElementById('mi-grid');
@@ -24,6 +24,16 @@
       pill: ['Unclaimed', 'Claim pending', 'Returned'],
       resolve: 'Mark as returned',
     },
+    claimed: {
+      steps: ['Found', 'You claimed it', 'Returned to you'],
+      pill: ['Unclaimed', 'Claim pending', 'Returned to you'],
+    },
+  };
+
+  const IN_TAB = {
+    lost: (i) => i.isOwner && i.type === 'lost',
+    found: (i) => i.isOwner && i.type === 'found',
+    claimed: (i) => i.claimedByMe && !i.isOwner,
   };
 
   const state = { items: [], tab: 'lost', status: 'all', q: '', loading: true, error: '' };
@@ -31,6 +41,24 @@
   const tabs = document.querySelectorAll('.mi-tab');
   const searchInput = document.getElementById('mi-search');
   const statusSelect = document.getElementById('mi-status');
+
+  const labelsFor = (item) => (item.claimedByMe && !item.isOwner ? LABELS.claimed : LABELS[item.type]);
+
+  /* ---------------- People helpers ---------------- */
+
+  function userName(u) {
+    if (!u) return '';
+    return u.name || (u.email ? u.email.split('@')[0] : '');
+  }
+
+  function userAvatar(u) {
+    const initial = escapeHTML((userName(u) || '?').charAt(0).toUpperCase());
+    let photo = '';
+    if (u && u.avatar && u.collectionId) {
+      photo = '<img src="' + escapeHTML(pb.files.getURL(u, u.avatar)) + '" alt="" loading="lazy" onerror="this.remove()">';
+    }
+    return '<span class="fi-avatar" aria-hidden="true">' + initial + photo + '</span>';
+  }
 
   /* ---------------- Profile ---------------- */
 
@@ -73,6 +101,11 @@
       date: String(rec.datetime || rec.created).replace(' ', 'T'),
       status: rec.status || 'OPEN',
       custody: rec.custody || '',
+      isOwner: rec.reported_by === user.id,
+      claimedByMe: rec.claimed_by === user.id,
+      claimedById: rec.claimed_by || '',
+      reporter: rec.expand?.reported_by || null,
+      claimer: rec.expand?.claimed_by || null,
       image: rec.image
         ? pb.files.getURL(rec, rec.image)
         : placeholderImage(type === 'lost' ? '🔍' : '📦', type === 'lost' ? '#F3EBDD' : '#E6F0E9'),
@@ -86,8 +119,8 @@
 
     try {
       const records = await pb.collection('items').getFullList({
-        filter: pb.filter('reported_by = {:uid}', { uid: user.id }),
-        expand: 'category',
+        filter: pb.filter('reported_by = {:uid} || claimed_by = {:uid}', { uid: user.id }),
+        expand: 'category,reported_by,claimed_by',
         sort: '-datetime',
       });
       state.items = records.map(mapItem);
@@ -104,7 +137,7 @@
     const q = state.q.trim().toLowerCase();
 
     return state.items
-      .filter((i) => i.type === state.tab)
+      .filter(IN_TAB[state.tab])
       .filter((i) => state.status === 'all' || i.status === STATUS_FILTER[state.status])
       .filter((i) => !q ||
         (i.title + ' ' + i.location + ' ' + i.category + ' ' + i.description).toLowerCase().includes(q));
@@ -113,6 +146,12 @@
   /* ---------------- Rendering ---------------- */
 
   function noteFor(item) {
+    if (item.claimedByMe && !item.isOwner) {
+      return item.status === 'RESOLVED'
+        ? 'Good news! This item was returned to you.'
+        : 'You claimed this item. Visit the campus office with a photo ID to confirm it is yours.';
+    }
+
     if (item.type === 'lost') {
       return [
         'Still searching. We will flag it here if a match is reported.',
@@ -121,8 +160,9 @@
       ][STAGE[item.status] ?? 0];
     }
 
-    if (item.status === 'CLAIMED') return 'Someone has claimed this item. Verify them at the campus office, then mark it returned.';
-    if (item.status === 'RESOLVED') return 'Returned to its owner. Thank you for helping!';
+    const claimer = item.claimedById ? (userName(item.claimer) || 'Someone') : '';
+    if (item.status === 'CLAIMED') return claimer + ' has claimed this item. Verify them at the campus office, then mark it returned.';
+    if (item.status === 'RESOLVED') return 'Returned to ' + (claimer || 'its owner') + '. Thank you for helping!';
     if (item.custody === 'AT_OFFICE') return 'This item is at the campus office, waiting for its owner.';
     if (item.custody === 'WITH_FINDER') return 'You are holding this item. Hand it to the campus office when you can.';
     return 'Waiting for its owner to claim it.';
@@ -132,11 +172,45 @@
     const stage = STAGE[item.status] ?? 0;
 
     return '<ol class="mi-track" aria-label="Status progress">' +
-      LABELS[item.type].steps.map((label, i) => {
+      labelsFor(item).steps.map((label, i) => {
         const cls = (i < stage || stage === 2) ? 'done' : (i === stage ? 'current' : '');
         return `<li class="${cls}"${cls === 'current' ? ' aria-current="step"' : ''}>${label}</li>`;
       }).join('') +
       '</ol>';
+  }
+
+  // Who claimed my item / who found the item I claimed
+  function personHTML(item) {
+    let label;
+    let person;
+
+    if (item.claimedByMe && !item.isOwner) {
+      label = 'Found by';
+      person = item.reporter;
+    } else if (item.isOwner && item.claimedById) {
+      label = item.type === 'found' ? 'Claimed by' : 'Matched by';
+      person = item.claimer;
+    } else {
+      return '';
+    }
+
+    if (!person) {
+      return `<div class="mi-person"><div class="mi-person-text"><span class="mi-person-label">${label}</span><span class="mi-muted">Details not available</span></div></div>`;
+    }
+
+    const email = person.email
+      ? `<a href="mailto:${escapeHTML(person.email)}">${escapeHTML(person.email)}</a>`
+      : '<span class="mi-muted">Email not shared</span>';
+
+    return `
+      <div class="mi-person">
+        ${userAvatar(person)}
+        <div class="mi-person-text">
+          <span class="mi-person-label">${label}</span>
+          <strong>${escapeHTML(userName(person) || 'FindIt user')}</strong>
+          ${email}
+        </div>
+      </div>`;
   }
 
   function actionsHTML(item) {
@@ -144,6 +218,16 @@
     const buttons = [
       `<a class="btn btn-outline" href="item-details.html?id=${encodeURIComponent(item.id)}">View</a>`,
     ];
+
+    // Item I claimed: no edit buttons, only a way to contact the finder
+    if (item.claimedByMe && !item.isOwner) {
+      const email = item.reporter && item.reporter.email;
+      if (email && item.status !== 'RESOLVED') {
+        const subject = encodeURIComponent('FindIt: ' + item.title);
+        buttons.push(`<a class="btn btn-primary" href="mailto:${escapeHTML(email)}?subject=${subject}">Email finder</a>`);
+      }
+      return buttons.join('');
+    }
 
     if (item.status !== 'RESOLVED') {
       if (item.type === 'found' && item.custody === 'WITH_FINDER') {
@@ -158,7 +242,8 @@
 
   function cardHTML(item) {
     const stage = STAGE[item.status] ?? 0;
-    const labels = LABELS[item.type];
+    const labels = labelsFor(item);
+    const typeLabel = item.type === 'lost' ? 'Lost' : 'Found';
     const url = 'item-details.html?id=' + encodeURIComponent(item.id);
 
     return `
@@ -166,18 +251,19 @@
         <a class="mi-media" href="${url}" aria-label="View ${escapeHTML(item.title)}">
           <img src="${item.image}" alt="${escapeHTML(item.title)}" loading="lazy">
           <div class="mi-pills">
-            <span class="mi-pill mi-pill--${item.type}">${item.type === 'lost' ? 'Lost' : 'Found'}</span>
+            <span class="mi-pill mi-pill--${item.type}">${typeLabel}</span>
             <span class="mi-pill ${PILL_CLASS[stage]}">${labels.pill[stage]}</span>
           </div>
         </a>
         <div class="mi-body">
           <h3 class="mi-title"><a href="${url}">${escapeHTML(item.title)}</a></h3>
-          ${item.description ? `<p class="mi-desc">${escapeHTML(item.description)}</p>` : ''}
+          <p class="mi-desc">${escapeHTML(item.description)}</p>
           <ul class="mi-meta">
             <li><span aria-hidden="true">📍</span> ${escapeHTML(item.location)}</li>
             <li><span aria-hidden="true">📅</span> ${formatDate(item.date)} · ${timeAgo(item.date)}</li>
             ${item.category ? `<li><span aria-hidden="true">🏷️</span> ${escapeHTML(item.category)}</li>` : ''}
           </ul>
+          ${personHTML(item)}
           ${trackerHTML(item)}
           <p class="mi-note">${escapeHTML(noteFor(item))}</p>
           <div class="mi-actions">${actionsHTML(item)}</div>
@@ -198,18 +284,30 @@
   }
 
   function emptyHTML() {
-    const total = state.items.filter((i) => i.type === state.tab).length;
-    const isLost = state.tab === 'lost';
+    const total = state.items.filter(IN_TAB[state.tab]).length;
 
     if (total === 0) {
-      return stateHTML({
-        icon: '📭',
-        title: isLost ? 'No lost items yet' : 'No found items yet',
-        text: isLost
-          ? 'You have not reported anything lost. If you lose something, report it and we will help you track it down.'
-          : 'You have not reported anything found. Found something on campus? Report it so the owner can claim it.',
-        actions: `<a href="report.html?type=${isLost ? 'LOST' : 'FOUND'}" class="btn btn-primary">${isLost ? 'Report a lost item' : 'Report a found item'}</a>`,
-      });
+      const empty = {
+        lost: {
+          icon: '📭',
+          title: 'No lost items yet',
+          text: 'You have not reported anything lost. If you lose something, report it and we will help you track it down.',
+          actions: '<a href="report.html?type=LOST" class="btn btn-primary">Report a lost item</a>',
+        },
+        found: {
+          icon: '📭',
+          title: 'No found items yet',
+          text: 'You have not reported anything found. Found something on campus? Report it so the owner can claim it.',
+          actions: '<a href="report.html?type=FOUND" class="btn btn-primary">Report a found item</a>',
+        },
+        claimed: {
+          icon: '🤝',
+          title: 'Nothing claimed yet',
+          text: 'Found items you claim will appear here, with their status. Once the finder marks one as returned, you will see it here too.',
+          actions: '<a href="items.html?type=found" class="btn btn-primary">Browse found items</a>',
+        },
+      };
+      return stateHTML(empty[state.tab]);
     }
 
     return stateHTML({
@@ -221,14 +319,18 @@
   }
 
   function render() {
-    const lost = state.items.filter((i) => i.type === 'lost').length;
-    const found = state.items.filter((i) => i.type === 'found').length;
+    const counts = {
+      lost: state.items.filter(IN_TAB.lost).length,
+      found: state.items.filter(IN_TAB.found).length,
+      claimed: state.items.filter(IN_TAB.claimed).length,
+    };
     const resolved = state.items.filter((i) => i.status === 'RESOLVED').length;
 
-    document.getElementById('count-lost').textContent = lost;
-    document.getElementById('count-found').textContent = found;
-    document.getElementById('stat-lost').textContent = lost;
-    document.getElementById('stat-found').textContent = found;
+    document.getElementById('count-lost').textContent = counts.lost;
+    document.getElementById('count-found').textContent = counts.found;
+    document.getElementById('count-claimed').textContent = counts.claimed;
+    document.getElementById('stat-lost').textContent = counts.lost;
+    document.getElementById('stat-found').textContent = counts.found;
     document.getElementById('stat-resolved').textContent = resolved;
 
     if (state.loading) {
@@ -271,7 +373,7 @@
   async function patchItem(id, data, message, btn) {
     btn.disabled = true;
     try {
-      const rec = await pb.collection('items').update(id, data, { expand: 'category' });
+      const rec = await pb.collection('items').update(id, data, { expand: 'category,reported_by,claimed_by' });
       const index = state.items.findIndex((i) => i.id === id);
       if (index !== -1) state.items[index] = mapItem(rec);
       render();
@@ -344,9 +446,13 @@
     }
   });
 
+  // Coming back with the Back button: refresh so statuses are current
+  window.addEventListener('pageshow', (e) => { if (e.persisted) loadItems(); });
+
   /* ---------------- Init ---------------- */
 
+  const startTab = new URLSearchParams(window.location.search).get('tab');
   renderProfile();
-  setTab(new URLSearchParams(window.location.search).get('tab') === 'found' ? 'found' : 'lost');
+  setTab(['found', 'claimed'].includes(startTab) ? startTab : 'lost');
   loadItems();
 })();

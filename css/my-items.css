@@ -283,6 +283,7 @@ body {
 .mi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-auto-rows: 1fr;              /* every row is as tall as the tallest card */
   gap: 18px;
 }
 
@@ -304,12 +305,14 @@ body {
 .mi-media {
   position: relative;
   display: block;
-  aspect-ratio: 16 / 10;
+  height: 180px;                    /* fixed image height */
+  overflow: hidden;
   background: var(--light-green);
 }
 
 .mi-media img {
-  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -354,6 +357,12 @@ body {
 }
 
 .mi-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  min-height: 2.6em;                /* always reserves two lines */
   color: var(--deep-green);
   font-size: 1.1rem;
   line-height: 1.3;
@@ -369,8 +378,10 @@ body {
   -webkit-line-clamp: 2;
   line-clamp: 2;
   overflow: hidden;
+  min-height: 2.9em;
   color: var(--muted);
   font-size: 0.9rem;
+  line-height: 1.45;
 }
 
 .mi-meta {
@@ -455,12 +466,61 @@ body {
 }
 
 .mi-note {
+  min-height: calc(1.4em * 3 + 20px);  
   padding: 10px 12px;
   border-radius: 10px;
   background: var(--light-green);
   color: var(--deep-green);
   font-size: 0.84rem;
   line-height: 1.4;
+}
+
+/* ---------- Person row (who claimed / who found) ---------- */
+
+.mi-person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--off-white);
+}
+
+.mi-person .fi-avatar {
+  width: 36px;
+  height: 36px;
+  font-size: 0.95rem;
+}
+
+.mi-person-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-size: 0.84rem;
+}
+
+.mi-person-label {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.mi-person-text strong {
+  color: var(--deep-green);
+}
+
+.mi-person-text a {
+  color: var(--green);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  word-break: break-all;
+}
+
+.mi-muted {
+  color: var(--muted);
 }
 
 /* ---------- Card actions ---------- */

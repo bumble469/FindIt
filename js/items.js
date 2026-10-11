@@ -6,6 +6,20 @@
 
   let ITEMS = [];
 
+  function userName(u) {
+    if (!u) return '';
+    return u.name || (u.email ? u.email.split('@')[0] : '');
+  }
+
+  function userAvatar(u, cls) {
+    const initial = escapeHTML((userName(u) || '?').charAt(0).toUpperCase());
+    let photo = '';
+    if (u && u.avatar && u.collectionId) {
+      photo = '<img src="' + escapeHTML(pb.files.getURL(u, u.avatar)) + '" alt="" loading="lazy" onerror="this.remove()">';
+    }
+    return '<span class="' + cls + '" aria-hidden="true">' + initial + photo + '</span>';
+  }
+
   /* ---------------- Settings ---------------- */
 
   const PILL_CLASS = {
@@ -19,6 +33,13 @@
     lost:  { open: 'Still missing', office: 'Still missing',    pending: 'Match found',   returned: 'Recovered' },
     found: { open: 'Unclaimed',     office: 'At campus office', pending: 'Claim pending', returned: 'Returned' },
   };
+
+  function statusLabel(item) {
+    if (item.claimedByMe) {
+      return item.status === 'returned' ? 'Returned to you' : 'You claimed this';
+    }
+    return STATUS_LABEL[item.type][item.status];
+  }
 
   /* ---------------- Elements ---------------- */
 
@@ -54,9 +75,12 @@
 
     try {
       const records = await pb.collection('items').getFullList({
-        expand: 'category',
+        expand: 'category,reported_by',
         sort: '-datetime',
       });
+
+      const me = getCurrentUser();
+      const myId = me ? me.id : null;
 
       ITEMS = records.map((rec) => ({
         id: rec.id,
@@ -67,6 +91,10 @@
         location: rec.location || 'Campus',
         date: String(rec.datetime || rec.created).replace(' ', 'T'),
         status: mapStatus(rec),
+        reportedAt: String(rec.created).replace(' ', 'T'),
+        mine: !!myId && rec.reported_by === myId,
+        claimedByMe: !!myId && rec.claimed_by === myId,
+        reporter: rec.expand?.reported_by || null,
         image: rec.image
           ? pb.files.getURL(rec, rec.image)
           : placeholderImage(rec.type === 'FOUND' ? '📦' : '🔍', rec.type === 'FOUND' ? '#E6F0E9' : '#F3EBDD'),
@@ -128,15 +156,28 @@
     const details = `<a class="btn btn-outline" href="item-details.html?id=${id}">Details</a>`;
     const disabled = (label) =>
       `<button type="button" class="btn btn-outline" disabled>${label}</button>${details}`;
-
+    if (item.claimedByMe) return disabled(item.status === 'returned' ? 'Returned to you' : 'You claimed this');
+    if (item.mine) {
+      if (item.status === 'pending') return disabled(item.type === 'found' ? 'Claim pending' : 'Match found');
+      if (item.status === 'returned') return disabled(item.type === 'found' ? 'Returned' : 'Recovered');
+      return disabled('Your report');
+    }
     if (item.type === 'found') {
       if (item.status === 'pending') return disabled('Claim pending');
-      if (item.status === 'returned') return disabled('Claimed');
+      if (item.status === 'returned') return disabled('Returned to owner');
       return `<a class="btn btn-primary" href="item-details.html?id=${id}&claim=1">Claim</a>${details}`;
     }
 
     if (item.status === 'returned') return disabled('Recovered');
     return `<a class="btn btn-primary" href="report.html?type=FOUND&match=${id}">I found this</a>${details}`;
+  }
+
+  function reporterHTML(item) {
+    const person = item.mine ? (item.reporter || getCurrentUser()) : item.reporter;
+    const name = item.mine ? 'You' : userName(person);
+    if (!name) return '';
+    return `<p class="br-by">${userAvatar(person, 'fi-avatar fi-avatar--xs')}` +
+      `<span>Reported by <strong>${escapeHTML(name)}</strong> · ${timeAgo(item.reportedAt)}</span></p>`;
   }
 
   function cardHTML(item) {
@@ -148,7 +189,7 @@
           <img src="${item.image}" alt="${escapeHTML(item.title)}" loading="lazy">
           <div class="br-pills">
             <span class="br-pill br-pill--${item.type}">${item.type === 'lost' ? 'Lost' : 'Found'}</span>
-            <span class="br-pill ${PILL_CLASS[item.status]}">${STATUS_LABEL[item.type][item.status]}</span>
+            <span class="br-pill ${PILL_CLASS[item.status]}">${statusLabel(item)}</span>
           </div>
         </a>
         <div class="br-body">
@@ -159,6 +200,7 @@
             <li><span aria-hidden="true">📅</span> ${formatDate(item.date)} · ${timeAgo(item.date)}</li>
             <li><span aria-hidden="true">🏷️</span> ${escapeHTML(item.category)}</li>
           </ul>
+          ${reporterHTML(item)}
           <div class="br-actions">${actionsFor(item)}</div>
         </div>
       </article>`;
@@ -251,6 +293,8 @@
     grid.classList.toggle('list-view', btn.dataset.view === 'list');
   }));
 
+  window.addEventListener('pageshow', (e) => { if (e.persisted) loadItems(); });
+  
   /* ---------------- Init ---------------- */
 
   setActiveTab();

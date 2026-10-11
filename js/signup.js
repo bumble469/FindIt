@@ -108,8 +108,8 @@
     btn.textContent = 'Creating account…';
 
     try {
-      await pb.collection('users').create({ name, email, password, passwordConfirm: confirm });
-      await pb.collection('users').authWithPassword(email, password);   // log in straight away
+      await pb.collection('users').create({ name, email, password, passwordConfirm: confirm, emailVisibility: true });
+      await pb.collection('users').authWithPassword(email, password); 
       goAfterAuth();
     } catch (err) {
       const data = err.response && err.response.data;
