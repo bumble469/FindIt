@@ -212,3 +212,28 @@ function goAfterAuth() {
   sessionStorage.removeItem('findit_next');
   window.location.href = next || '../index.html';
 }
+
+(function () {
+  const nav = document.querySelector('.navbar');
+  const inner = nav && nav.querySelector('.nav-inner');
+  const menu = nav && nav.querySelector('.nav-menu');
+  if (!inner || !menu) return;
+
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'nav-toggle';
+  btn.setAttribute('aria-label', 'Toggle menu');
+  btn.setAttribute('aria-expanded', 'false');
+  btn.innerHTML = '<span></span><span></span><span></span>';
+  inner.insertBefore(btn, menu);
+
+  const setOpen = (open) => {
+    nav.classList.toggle('open', open);
+    btn.setAttribute('aria-expanded', open);
+  };
+
+  btn.addEventListener('click', () => setOpen(!nav.classList.contains('open')));
+  menu.addEventListener('click', (e) => { if (e.target.closest('a, button')) setOpen(false); });
+  document.addEventListener('click', (e) => { if (!nav.contains(e.target)) setOpen(false); });
+  window.addEventListener('resize', () => { if (window.innerWidth > 860) setOpen(false); });
+})();
