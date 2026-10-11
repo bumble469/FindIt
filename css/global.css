@@ -189,9 +189,7 @@ a {
   display: block;
 }
 
-/* =========================
-   NAVIGATION
-   ========================= */
+/* nav */
 
 .nav-menu {
   display: contents;
@@ -237,36 +235,82 @@ a {
   font-weight: 600;
 }
 
-
-/* =========================
-   HEADINGS
-   ========================= */
-
 .container h1 {
   color: var(--deep-green);
   margin-bottom: 1rem;
 }
 
 
-/* =========================
-   RESPONSIVE NAVBAR
-   ========================= */
+.nav-toggle {
+  display: none;               
+}
 
 @media (max-width: 860px) {
+  :root { --nav-height: 64px; }
 
   .nav-inner {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    padding: 12px 20px;
-    gap: 10px;
+    grid-template-columns: 1fr auto;   
+    padding: 0 16px;
   }
 
-  .nav-logo,
-  .nav-actions {
-    justify-self: center;
+  .nav-logo img { height: 3.2rem; }
+
+  /* Hamburger button */
+  .nav-toggle {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 42px;
+    height: 42px;
+    padding: 0 10px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
   }
+
+  .nav-toggle span {
+    display: block;
+    height: 2px;
+    background: var(--deep-green);
+    border-radius: 2px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  .navbar.open .nav-toggle span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .navbar.open .nav-toggle span:nth-child(2) { opacity: 0; }
+  .navbar.open .nav-toggle span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .nav-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 16px 16px;
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 12px 24px -12px rgba(23, 63, 53, 0.25);
+  }
+
+  .navbar.open .nav-menu { display: flex; }
 
   .nav-links {
-    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
   }
+
+  .nav-links a { padding: 12px; }
+
+  .nav-actions {
+    flex-wrap: wrap;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .nav-actions .btn { flex: 1; }
 }
