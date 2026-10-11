@@ -495,6 +495,19 @@ body {
   to { transform: rotate(360deg); }
 }
 
+/* ---------- Confirm dialog: red button for destructive actions ---------- */
+
+.fi-btn.fi-btn-danger {
+  background: #B42318;
+  border-color: #B42318;
+  color: #fff;
+}
+
+.fi-btn.fi-btn-danger:hover {
+  background: #8F1D1D;
+  border-color: #8F1D1D;
+}
+
 /* ---------- Toast ---------- */
 
 .dt-toast {

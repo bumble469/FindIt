@@ -37,6 +37,20 @@
   let item = null;
   let busy = false;
 
+  function userName(u) {
+    if (!u) return '';
+    return u.name || (u.email ? u.email.split('@')[0] : '');
+  }
+
+  function userAvatar(u, cls) {
+    const initial = escapeHTML((userName(u) || '?').charAt(0).toUpperCase());
+    let photo = '';
+    if (u && u.avatar && u.collectionId) {
+      photo = '<img src="' + escapeHTML(pb.files.getURL(u, u.avatar)) + '" alt="" loading="lazy" onerror="this.remove()">';
+    }
+    return '<span class="' + cls + '" aria-hidden="true">' + initial + photo + '</span>';
+  }
+
   /* ---------------- Back link (remembers where you came from) ---------------- */
 
   (function setBackLink() {
@@ -84,6 +98,9 @@
       custody: rec.custody || '',
       isOwner: rec.reported_by === user.id,
       claimedByMe: rec.claimed_by === user.id,
+      claimedById: rec.claimed_by || '',
+      reporter: rec.expand?.reported_by || null,
+      claimer: rec.expand?.claimed_by || null,
       identifying: identifyingText(rec.item_specs),
       image: rec.image
         ? pb.files.getURL(rec, rec.image)
@@ -97,7 +114,7 @@
     renderState('loading');
 
     try {
-      const rec = await pb.collection('items').getOne(itemId, { expand: 'category' });
+      const rec = await pb.collection('items').getOne(itemId, { expand: 'category,reported_by,claimed_by' });
       item = mapItem(rec);
       render();
     } catch (err) {
@@ -200,8 +217,6 @@
       out.push(`<a class="btn btn-outline" href="mailto:${escapeHTML(CAMPUS_OFFICE.contact)}?subject=${subject}">Email the office</a>`);
     }
 
-    out.push(`<button type="button" class="btn btn-ghost" data-action="copy">Copy link</button>`);
-
     if (it.isOwner) {
       out.push(`<button type="button" class="btn btn-ghost dt-danger" data-action="delete">Delete</button>`);
     }
@@ -231,6 +246,50 @@
           <li>${icon('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>')}
             <div><strong>Contact</strong><span>${escapeHTML(CAMPUS_OFFICE.contact)}</span></div></li>
         </ul>
+      </section>`;
+  }
+
+  function personCardHTML(heading, u, isMe, sub) {
+    if (!u && !isMe) {
+      return `<div class="dt-person"><h3>${heading}</h3><p class="dt-muted">Details are not available.</p></div>`;
+    }
+    const p = u || user;
+    const name = (userName(p) || 'FindIt user') + (isMe ? ' (you)' : '');
+    const email = p.email
+      ? `<a href="mailto:${escapeHTML(p.email)}">${escapeHTML(p.email)}</a>`
+      : '<span class="dt-muted">Email not shared</span>';
+    const phone = p.phone
+      ? `<li><a href="tel:${escapeHTML(String(p.phone).replace(/[^\d+]/g, ''))}">${escapeHTML(p.phone)}</a></li>`
+      : '';
+
+    return `
+      <div class="dt-person">
+        <h3>${heading}</h3>
+        <div class="dt-person-main">
+          ${userAvatar(p, 'fi-avatar fi-avatar--lg')}
+          <div>
+            <strong class="dt-person-name">${escapeHTML(name)}</strong>
+            ${sub ? `<span class="dt-muted">${escapeHTML(sub)}</span>` : ''}
+          </div>
+        </div>
+        <ul class="dt-person-info"><li>${email}</li>${phone}</ul>
+      </div>`;
+  }
+
+  function peopleHTML(it) {
+    const cards = [personCardHTML('Reported by', it.reporter, it.isOwner, 'Reported ' + timeAgo(it.reportedAt))];
+    if (it.claimedById) {
+      cards.push(personCardHTML(
+        it.type === 'found' ? 'Claimed by' : 'Matched by',
+        it.claimer,
+        it.claimedByMe,
+        it.status === 'RESOLVED' ? 'Item returned' : 'Awaiting verification'
+      ));
+    }
+    return `
+      <section class="dt-panel dt-people" aria-label="People involved">
+        <h2>People</h2>
+        <div class="dt-people-grid">${cards.join('')}</div>
       </section>`;
   }
 
@@ -292,6 +351,7 @@
         </div>
       </article>
 
+      ${peopleHTML(it)}
       <div class="dt-lower">
         <section class="dt-panel">
           <h2>Item details</h2>
@@ -370,7 +430,7 @@
     busy = true;
 
     try {
-      const rec = await pb.collection('items').update(item.id, data, { expand: 'category' });
+      const rec = await pb.collection('items').update(item.id, data, { expand: 'category,reported_by,claimed_by' });
       item = mapItem(rec);
       render();
       toast(message);
@@ -385,7 +445,13 @@
 
   async function removeItem() {
     if (busy) return;
-    if (!confirm('Delete this report? This cannot be undone.')) return;
+    const ok = await askConfirm({
+      title: 'Delete this report?',
+      text: 'This cannot be undone.',
+      confirmLabel: 'Delete',
+      danger: true,
+    });
+    if (!ok) return;
     busy = true;
 
     try {
@@ -399,30 +465,66 @@
     }
   }
 
-  async function copyLink() {
-    const url = window.location.origin + window.location.pathname + '?id=' + encodeURIComponent(item.id);
-    try {
-      await navigator.clipboard.writeText(url);
-      toast('Link copied.');
-    } catch (e) {
-      toast('Could not copy the link.', 'error');
+  let confirmDlg = null;
+
+  function askConfirm({ title, text, confirmLabel, danger }) {
+    if (!confirmDlg) {
+      confirmDlg = document.createElement('dialog');
+      confirmDlg.className = 'fi-dialog fi-dialog--small';
+      confirmDlg.setAttribute('aria-labelledby', 'dt-confirm-title');
+      confirmDlg.innerHTML = `
+        <div class="fi-body">
+          <h2 id="dt-confirm-title"></h2>
+          <p class="fi-text" id="dt-confirm-text"></p>
+          <div class="fi-actions fi-actions--end">
+            <button type="button" class="fi-btn fi-btn-secondary" data-close>Cancel</button>
+            <button type="button" class="fi-btn fi-btn-primary" id="dt-confirm-ok"></button>
+          </div>
+        </div>`;
+      document.body.appendChild(confirmDlg);
+
+      confirmDlg.addEventListener('click', (e) => {
+        if (e.target === confirmDlg || e.target.closest('[data-close]')) confirmDlg.close('cancel');
+      });
+      confirmDlg.querySelector('#dt-confirm-ok').addEventListener('click', () => confirmDlg.close('ok'));
     }
+
+    confirmDlg.querySelector('#dt-confirm-title').textContent = title;
+    confirmDlg.querySelector('#dt-confirm-text').textContent = text;
+    const okBtn = confirmDlg.querySelector('#dt-confirm-ok');
+    okBtn.textContent = confirmLabel;
+    okBtn.classList.toggle('fi-btn-danger', !!danger);
+    confirmDlg.returnValue = '';
+
+    return new Promise((resolve) => {
+      const onClose = () => {
+        confirmDlg.removeEventListener('close', onClose);
+        resolve(confirmDlg.returnValue === 'ok');
+      };
+      confirmDlg.addEventListener('close', onClose);
+      confirmDlg.showModal();
+    });
   }
 
   root.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
-
     switch (btn.dataset.action) {
       case 'claim':
-        if (confirm('Claim this item? You will need to confirm ownership at the campus office with a photo ID.')) {
+        if (item.isOwner) { toast('You cannot claim an item you reported.', 'error'); break; }
+        askConfirm({
+          title: 'Claim this item?',
+          text: 'You will need to confirm ownership at the campus office with a photo ID.',
+          confirmLabel: 'Claim item',
+        }).then((ok) => {
+          if (!ok) return;
           patchItem(
             { status: 'CLAIMED', claimed_by: user.id },
             'Claim sent. Visit the campus office to confirm.',
-            'Claiming is not available for this item right now. Please contact the campus office.'
+            'This item cannot be claimed right now. Someone else may have claimed it already.'
           );
-        }
-        break;
+        });
+      break;
       case 'resolve':
         patchItem({ status: 'RESOLVED' }, item.type === 'lost' ? 'Marked as recovered.' : 'Marked as returned.');
         break;
@@ -431,9 +533,6 @@
         break;
       case 'delete':
         removeItem();
-        break;
-      case 'copy':
-        copyLink();
         break;
       case 'retry':
         loadItem();

@@ -229,6 +229,18 @@
     pwSubmit.textContent = 'Update password';
   });
 
+  // Share the user's email with other FindIt users so reporters and claimers can contact each other
+  async function shareEmail() {
+    const user = getCurrentUser();
+    if (!user || user.emailVisibility) return;
+    try {
+      await pb.collection('users').update(user.id, { emailVisibility: true });
+    } catch (err) {
+      console.warn('Could not share email:', err);
+    }
+  }
+  shareEmail();
+
   pb.authStore.onChange(refreshAvatars);
   refreshAvatars();
 })();
