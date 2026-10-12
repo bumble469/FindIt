@@ -128,6 +128,102 @@ function setupPhotoPreview() {
   });
 }
 
+  /* ---------- Camera ---------- */
+
+// Put a File into the normal photo input so the rest of the form works unchanged
+function setPhotoFile(file) {
+  const input = document.getElementById("item-photo");
+  const dt = new DataTransfer();
+  dt.items.add(file);
+  input.files = dt.files;
+  input.dispatchEvent(new Event("change"));
+}
+
+// Phone photos are often over the 5 MB limit, so shrink them first
+async function shrinkImage(file, maxSide, quality) {
+  maxSide = maxSide || 1600;
+  quality = quality || 0.85;
+  const bitmap = await createImageBitmap(file);
+  const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(bitmap.width * scale);
+  canvas.height = Math.round(bitmap.height * scale);
+  canvas.getContext("2d").drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  const blob = await new Promise(function (res) { canvas.toBlob(res, "image/jpeg", quality); });
+  return new File([blob], "camera-" + Date.now() + ".jpg", { type: "image/jpeg" });
+}
+
+async function openWebcam() {
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+  } catch (err) {
+    notify("Could not open the camera. Allow camera access, or choose a file instead.", "error");
+    return;
+  }
+
+  const dlg = document.createElement("dialog");
+  dlg.className = "fi-dialog";
+  dlg.innerHTML =
+    '<div class="fi-head"><h2>Take a photo</h2>' +
+    '<button type="button" class="fi-close" data-cancel aria-label="Close">&times;</button></div>' +
+    '<div class="fi-body"><video class="cam-video" autoplay playsinline muted></video>' +
+    '<div class="fi-actions fi-actions--end">' +
+    '<button type="button" class="fi-btn fi-btn-secondary" data-cancel>Cancel</button>' +
+    '<button type="button" class="fi-btn fi-btn-primary" data-shoot>Capture</button></div></div>';
+  document.body.appendChild(dlg);
+
+  const video = dlg.querySelector("video");
+  video.srcObject = stream;
+
+  dlg.addEventListener("close", function () {
+    stream.getTracks().forEach(function (t) { t.stop(); });
+    dlg.remove();
+  });
+
+  dlg.addEventListener("click", function (e) {
+    if (e.target.closest("[data-cancel]")) { dlg.close(); return; }
+    if (!e.target.closest("[data-shoot]") || !video.videoWidth) return;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext("2d").drawImage(video, 0, 0);
+    canvas.toBlob(function (blob) {
+      if (blob) setPhotoFile(new File([blob], "camera-" + Date.now() + ".jpg", { type: "image/jpeg" }));
+      dlg.close();
+    }, "image/jpeg", 0.9);
+  });
+
+  dlg.showModal();
+}
+
+function setupCamera() {
+  const btn = document.getElementById("btn-camera");
+  const camInput = document.getElementById("item-photo-camera");
+
+  camInput.addEventListener("change", async function () {
+    const file = camInput.files[0];
+    camInput.value = "";
+    if (!file) return;
+    try {
+      setPhotoFile(await shrinkImage(file));
+    } catch (err) {
+      notify("Could not read that photo. Please try again.", "error");
+    }
+  });
+
+  document.getElementById("btn-gallery").addEventListener("click", function () {
+    document.getElementById("item-photo").click();
+  });
+  
+  btn.addEventListener("click", function () {
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
+    const hasWebcam = navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
+    if (isTouch || !hasWebcam) camInput.click();
+    else openWebcam();
+  });
+}
 
 /* ---------- Submit ---------- */
 
@@ -358,13 +454,13 @@ async function updateMatchedItem(found) {
 /* ---------- Start ---------- */
 
 document.addEventListener("DOMContentLoaded", async function () {
-  // ?type=FOUND or ?type=LOST in the address preselects the type
   const wanted = (new URLSearchParams(window.location.search).get("type") || "").toUpperCase();
   const radio = document.querySelector('input[name="type"][value="' + wanted + '"]');
   if (radio) radio.checked = true;
 
   updateFormForType();
   setupPhotoPreview();
+  setupCamera();
   setupForm();
 
   try {

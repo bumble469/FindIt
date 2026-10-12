@@ -260,7 +260,7 @@
           <p class="mi-desc">${escapeHTML(item.description)}</p>
           <ul class="mi-meta">
             <li><span aria-hidden="true">📍</span> ${escapeHTML(item.location)}</li>
-            <li><span aria-hidden="true">📅</span> ${formatDate(item.date)} · ${timeAgo(item.date)}</li>
+            <li><span aria-hidden="true">🗓️</span> ${formatDate(item.date)} · ${timeAgo(item.date)}</li>
             ${item.category ? `<li><span aria-hidden="true">🏷️</span> ${escapeHTML(item.category)}</li>` : ''}
           </ul>
           ${personHTML(item)}
