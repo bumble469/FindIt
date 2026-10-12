@@ -77,7 +77,7 @@ body {
   flex: 1;
   min-height: 0;                          /* lets the children scroll instead of growing */
   width: 100%;
-  max-width: 1100px;
+  max-width: var(--page-width);
   margin: 0 auto;
   padding: 24px 20px;
   display: grid;
