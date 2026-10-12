@@ -197,7 +197,7 @@
           ${item.description ? `<p class="br-desc">${escapeHTML(item.description)}</p>` : ''}
           <ul class="br-meta">
             <li><span aria-hidden="true">📍</span> ${escapeHTML(item.location)}</li>
-            <li><span aria-hidden="true">📅</span> ${formatDate(item.date)} · ${timeAgo(item.date)}</li>
+            <li><span aria-hidden="true">🗓️</span> ${formatDate(item.date)} · ${timeAgo(item.date)}</li>
             <li><span aria-hidden="true">🏷️</span> ${escapeHTML(item.category)}</li>
           </ul>
           ${reporterHTML(item)}

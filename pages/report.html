@@ -98,24 +98,28 @@
  
             <div class="field">
               <label for="item-location">Location <span class="req">*</span></label>
-              <input type="text" id="item-location" maxlength="120"
-                     placeholder="e.g. Central Library, 1st floor" />
+              <input type="text" id="item-location" maxlength="120" placeholder="e.g. Central Library, 1st floor" />
             </div>
  
             <div class="field">
-              <label for="item-photo">Photo (one)</label>
-              <input type="file" id="item-photo" accept="image/*" />
+              <label for="btn-gallery">Photo (one)</label>
+
+              <div class="photo-actions">
+                <button type="button" class="btn btn-outline" id="btn-gallery">🏞️ Choose a photo</button>
+                <button type="button" class="btn btn-outline" id="btn-camera" data-only="FOUND">🅾 Take a photo</button>
+              </div>
+
+              <input type="file" id="item-photo" accept="image/*" hidden />
+              <input type="file" id="item-photo-camera" accept="image/*" capture="environment" hidden />
               <div id="photo-preview" class="preview-grid"></div>
             </div>
  
             <!-- Shown only when "I lost something" is selected -->
             <div class="field" data-only="LOST">
               <label for="item-identifying">Unique identifying details</label>
-              <textarea id="item-identifying" rows="3" maxlength="400"
-                        placeholder="Scratches, stickers, markings, serial number..."></textarea>
+              <textarea id="item-identifying" rows="3" maxlength="400" placeholder="Scratches, stickers, markings, serial number..."></textarea>
               <div class="hint">🔒 This will NOT be shown publicly.</div>
             </div>
- 
             <!-- Shown only when "I found something" is selected -->
             <div class="field" data-only="FOUND">
               <p>Where is the item now? <span class="req">*</span></p>
