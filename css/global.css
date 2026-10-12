@@ -33,6 +33,8 @@
   /* Layout */
   --radius: 10px;
   --nav-height: 80px;
+  --page-width: 1400px;          /* new: main content width */
+  --page-width-narrow: 1240px;   /* new: details + report pages */
 }
 
 

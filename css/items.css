@@ -1,8 +1,5 @@
 /* =========================================================
-   Browse Items – same look as My Items:
-   soft gradient page, rounded banner, white main card,
-   rounded cards / buttons / search / filters.
-   Needs only global.css.
+   Browse Items 
    ========================================================= */
 
 body {
@@ -10,7 +7,7 @@ body {
 }
 
 .br-layout {
-  max-width: 1200px;
+  max-width: var(--page-width);
   margin: 0 auto;
   padding: 28px 20px 60px;
   display: grid;
