@@ -10,7 +10,7 @@ body {
 }
 
 .dt-layout {
-  max-width: 1100px;
+  max-width: var(--page-width);
   margin: 0 auto;
   padding: 22px 20px 60px;
 }
@@ -62,7 +62,7 @@ body {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .dt-pills {
